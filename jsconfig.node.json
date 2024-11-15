@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",  // Set the base directory for imports to `src`
+    "paths": {
+      "@components/*": ["src/components/*"],  // Alias `@components` to `src/components`
+      "@assets/*": ["src/assets/*"]  // Alias `@assets` to `src/assets`
+    },
+    "allowSyntheticDefaultImports": true,  // Allow default imports from modules without default export
+    "strict": true  // Enable strict mode for better code quality and error-checking
+  },
+  "include": [
+    "src/**/*"  // Include all files inside the `src` directory
+  ]
+}
