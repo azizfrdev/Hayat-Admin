@@ -1,4 +1,4 @@
-exports.createAdminValidateSchema = {
+exports.createAdminSchema = {
     firstName: {
         isString: {
             errorMessage: "Ism string bo'lishi kerak"

@@ -1,9 +1,11 @@
 exports.logout = (req, res) => {
   try {
-    res.clearCooies("authcookie");
-    res.clearCooies("token");
+    res.clearCookie("authcookie");
+    res.clearCookie("token");
 
-    return res.redirect("/login");
+    return res.status(200).send({
+      message: "Logout muvvaffaqiyatli amalga oshirildi!"
+    })
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -12,7 +14,7 @@ exports.logout = (req, res) => {
       });
     }
     return res.status(500).send({
-      error: "Internal server error!",
+      error: "Serverda xatolik!",
     });
   }
 };

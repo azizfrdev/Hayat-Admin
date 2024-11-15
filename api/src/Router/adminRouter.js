@@ -1,13 +1,14 @@
-const { createAdmin, getAllAdmin } = require('../controller/adminController')
+const { createAdmin, getAllAdmin, deleteAdmin } = require('../controller/adminController')
 const { checkSchema } = require('express-validator')
-const { createAdminValidateSchema} = require('../validators/createAdminValidate')
+const { createAdminSchema} = require('../validators/adminValidate')
 const { roleAccessMiddleware } = require('../middlewares/role-access-middleware')
 
 const router = require('express').Router()
 
 router
-.post('/admin-create', checkSchema(createAdminValidateSchema), createAdmin)
-.get('/admins', roleAccessMiddleware, getAllAdmin)
+.post('/admin-create', roleAccessMiddleware('admin'), checkSchema(createAdminSchema), createAdmin)
+.get('/admins', roleAccessMiddleware('admin'), getAllAdmin)
+.post('/admin/:id/delete', roleAccessMiddleware('admin'), deleteAdmin)
 
 
 module.exports = router

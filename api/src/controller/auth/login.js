@@ -49,6 +49,7 @@ exports.login = async (req, res) => {
       res.cookie("token", userId, { httpOnly: true });
 
       return res.status(200).send({
+        message: 'Login muvvaffaqiyatli amalga oshirildi!',
         token: token
       })
     }
@@ -77,11 +78,12 @@ exports.login = async (req, res) => {
       res.cookie("token", userId, { httpOnly: true });
 
       return res.status(200).send({
+        message: 'Login muvvaffaqiyatli amalga oshirildi!',
         token: token
       })
     }
 
-    return res.status(404).send({ message: 'User not found' })
+    return res.status(404).send({ message: 'User topilmadi' })
 
   } catch (error) {
     console.log(error);
@@ -91,7 +93,7 @@ exports.login = async (req, res) => {
         })
     }
     return res.status(500).send({
-        error: "Internal server error!"
+        error: "Serverda xatolik!"
     })
   }
 };

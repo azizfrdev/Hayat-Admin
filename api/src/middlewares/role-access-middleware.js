@@ -23,6 +23,12 @@ exports.roleAccessMiddleware = function (roles) {
         next()
         } catch (error) {
             console.log(error);
+            if (error.message) {
+              return res.status(400).send({
+                error: error.message,
+              });
+            }
+            return res.status(500).send("Serverda xatolik!"); 
         }
     }
 }
