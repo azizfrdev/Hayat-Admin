@@ -1,6 +1,6 @@
 import { Admin, Resource } from "react-admin";
 import { dataProvider } from "./dataProvider";
-import { PostList } from "./components/posts";
+import { PostList } from "./posts";
 import { UserList } from "./users";
 
 export const App = () => (
