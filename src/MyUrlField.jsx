@@ -6,8 +6,8 @@ const MyUrlField = ({ source }) => {
     const record = useRecordContext();
     return record ? (
         <Link href={record[source]} sx={{ textDecoration: "none" }}>
-            {record[source]}
-            <LaunchIcon sx={{ fontSize: 15, ml: 1 }} />
+        {record[source]}
+        <LaunchIcon sx={{ fontSize: 15, ml: 1 }} />
         </Link>
     ) : null;
 };
