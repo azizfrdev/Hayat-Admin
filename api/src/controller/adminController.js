@@ -33,6 +33,7 @@ exports.createAdmin = async (req, res) => {
     const passwordHash = await bcrypt.hash(data.password, 10)
     delete data.password
 
+
     const admin = await adminModel.create({
       firstName: data.firstName,
       lastName: data.lastName,
