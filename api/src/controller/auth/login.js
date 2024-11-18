@@ -11,7 +11,7 @@ const generateToken = (id, role) => {
     id,
     role,
   };
-  return jwt.sign(payload, process.env.JWT_KEY);
+  return jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "1d" });
 };
 
 exports.login = async (req, res) => {

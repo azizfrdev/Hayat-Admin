@@ -14,17 +14,25 @@ exports.createAdmin = async (req, res) => {
     }
     const data = matchedData(req);
 
+    // data bo'sh emasligini tekshirish
+    if (!Object.keys(data)) {
+      return res.status(404).send({
+        error: "Ma'lumotlar topilmadi!"
+      })
+    }
+
     // Usernameni tekshirish
     const condidat = await adminModel.findOne({ username: data.username })
     if (condidat) {
-        return res.status(400).send({
-            error: "Bunday foydalanuvchi nomi allaqachon bor!"
-        })
+      return res.status(400).send({
+        error: "Bunday foydalanuvchi nomi allaqachon bor!"
+      })
     }
 
     // Parolni hashlash
     const passwordHash = await bcrypt.hash(data.password, 10)
     delete data.password
+
 
     const admin = await adminModel.create({
       firstName: data.firstName,

@@ -1,8 +1,8 @@
-const { staffModel } = require('../models/staffModel')
+const { newsModel } = require('../models/newsModel')
 const { validationResult, matchedData } = require('express-validator')
 
-// Xodim yaratish
-exports.createStaff = async (req, res) => {
+// Yangilik yaratish
+exports.createNews = async (req, res) => {
     try {
         // error bilan ishlash
         const errors = validationResult(req);
@@ -20,17 +20,15 @@ exports.createStaff = async (req, res) => {
             })
         }
 
-        const staff = await staffModel.create({
-            fullName: data.fullName,
-            position: data.position,
+        const news = await newsModel.create({
+            title: data.title,
             description: data.description
         })
 
         return res.status(200).send({
-            message: "Xodim muvaffaqiyatli yaratildi!",
-            staff
+            message: "Yangilik muvaffaqiyatli yaratildi!",
+            news
         })
-
     } catch (error) {
         console.log(error);
         if (error.message) {
@@ -42,20 +40,20 @@ exports.createStaff = async (req, res) => {
     }
 }
 
-// Barcha xodimlarni ko'rish
-exports.getAllStaff = async (req, res) => {
+// Hamma yangiliklarni olish
+exports.getAllNews = async (req, res) => {
     try {
-        const staff = await staffModel.find()
+        const news = await newsModel.find()
 
-        if (!staff.length) {
+        if (!news.length) {
             return res.status(404).send({
-                error: "Xodimlar mavjud emas!"
+                error: "Yangiliklar mavjud emas!"
             })
         }
 
         return res.status(200).send({
-            message: "Xodimlar jadvali!",
-            staff
+            message: "Yangiliklar jadvali!",
+            news
         })
 
     } catch (error) {
@@ -69,8 +67,8 @@ exports.getAllStaff = async (req, res) => {
     }
 }
 
-// Bitta xodimni olish
-exports.getOneStaff = async (req, res) => {
+// Bitta yangilini ko'rish
+exports.getOneNews = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -81,17 +79,17 @@ exports.getOneStaff = async (req, res) => {
             })
         }
 
-        const staff = await staffModel.findById(id)
+        const news = await newsModel.findById(id)
 
-        if (!staff) {
+        if (!news) {
             return res.status(404).send({
-                error: "Xodim topilmadi!"
+                error: "Yangilik topilmadi!"
             })
         }
 
         return res.status(200).send({
-            message: "Xodim!",
-            staff
+            message: "Yangilik!",
+            news
         })
 
     } catch (error) {
@@ -105,8 +103,8 @@ exports.getOneStaff = async (req, res) => {
     }
 }
 
-// Xodim ma'lumotlarini yangilash
-exports.updateStaff = async (req, res) => {
+// Yangilik ma'lumotlarini yangilash
+exports.updateNews = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -117,11 +115,11 @@ exports.updateStaff = async (req, res) => {
             })
         }
 
-        const staff = await staffModel.findById(id)
+        const news = await newsModel.findById(id)
 
-        if (!staff) {
+        if (!news) {
             return res.status(404).send({
-                error: "Xodim topilmadi!"
+                error: "Yangilik topilmadi!"
             })
         }
 
@@ -141,31 +139,31 @@ exports.updateStaff = async (req, res) => {
             })
         }
 
-        const updatedStaff = {
-            fullName: data.fullName || staff.fullName,
-            position: data.position || staff.position,
-            description: data.description || staff.description
+        const updatedNews = {
+            title: data.title || news.title,
+            description: data.description || news.description
         }
 
-        await staffModel.findByIdAndUpdate(id, updatedStaff)
+        await newsModel.findByIdAndUpdate(id, updatedNews)
 
         return res.status(200).send({
-            message: "Xodim ma'lumotlari muvaffaqiyatli yangilandi!",
-            staff
+            message: "Yangilik ma'lumotlari muvaffaqiyatli yangilandi!",
+            updatedNews
         })
+
     } catch (error) {
         console.log(error);
         if (error.message) {
-          return res.status(400).send({
-            error: error.message,
-          });
+            return res.status(400).send({
+                error: error.message,
+            });
         }
         return res.status(500).send("Serverda xatolik!");
     }
 }
 
-// Xodimni o'chirish
-exports.deleteStaff = async (req, res) => {
+// Yangilini o'chirish
+exports.deleteNews = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -176,25 +174,26 @@ exports.deleteStaff = async (req, res) => {
             })
         }
 
-        const staff = await staffModel.findById(id)
+        const news = await newsModel.findById(id)
 
-        if (!staff) {
+        if (!news) {
             return res.status(404).send({
-                error: "Xodim topilmadi!"
+                error: "Yangilik topilmadi!"
             })
         }
 
-        await staffModel.findByIdAndDelete(id)
+        await newsModel.findByIdAndDelete(id)
 
         return res.status(200).send({
-            message: "Xodim muvaffaqiyatli o'chirildi!"
+            message: "Yangilik muvaffaqiyatli o'chirildi!"
         })
+
     } catch (error) {
         console.log(error);
         if (error.message) {
-          return res.status(400).send({
-            error: error.message,
-          });
+            return res.status(400).send({
+                error: error.message,
+            });
         }
         return res.status(500).send("Serverda xatolik!");
     }
