@@ -1,8 +1,8 @@
+const { newsModel } = require('../models/newsModel')
 const { validationResult, matchedData } = require('express-validator')
-const { serviceModel } = require('../models/serviceModel')
 
-// Yangi xizmat yaratish
-exports.createService = async (req, res) => {
+// Yangilik yaratish
+exports.createNews = async (req, res) => {
     try {
         // error bilan ishlash
         const errors = validationResult(req);
@@ -20,17 +20,15 @@ exports.createService = async (req, res) => {
             })
         }
 
-        const service = await serviceModel.create({
-            name: data.name,
+        const news = await newsModel.create({
             title: data.title,
             description: data.description
         })
 
         return res.status(200).send({
-            message: "Yangi xizmat muvaffaqiyatli yaratildi!",
-            service
+            message: "Yangilik muvaffaqiyatli yaratildi!",
+            news
         })
-
     } catch (error) {
         console.log(error);
         if (error.message) {
@@ -42,20 +40,20 @@ exports.createService = async (req, res) => {
     }
 }
 
-// Barcha xizmatlarni ko'rish
-exports.getAllServices = async (req, res) => {
+// Hamma yangiliklarni olish
+exports.getAllNews = async (req, res) => {
     try {
-        const services = await serviceModel.find()
+        const news = await newsModel.find()
 
-        if (!services.length) {
+        if (!news.length) {
             return res.status(404).send({
-                error: "Xizmatlar mavjud emas!"
+                error: "Yangiliklar mavjud emas!"
             })
         }
 
         return res.status(200).send({
-            message: "Xizmatlar jadvali!",
-            services
+            message: "Yangiliklar jadvali!",
+            news
         })
 
     } catch (error) {
@@ -69,8 +67,8 @@ exports.getAllServices = async (req, res) => {
     }
 }
 
-// Bitta xizmatni ko'rish
-exports.getOneService = async (req, res) => {
+// Bitta yangilini ko'rish
+exports.getOneNews = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -81,17 +79,17 @@ exports.getOneService = async (req, res) => {
             })
         }
 
-        const service = await serviceModel.findById(id)
+        const news = await newsModel.findById(id)
 
-        if (!service) {
+        if (!news) {
             return res.status(404).send({
-                error: "Xizmat topilmadi!"
+                error: "Yangilik topilmadi!"
             })
         }
 
         return res.status(200).send({
-            message: "Xizmat!",
-            service
+            message: "Yangilik!",
+            news
         })
 
     } catch (error) {
@@ -105,8 +103,8 @@ exports.getOneService = async (req, res) => {
     }
 }
 
-// Xizmat ma'lumotlarini yangilash
-exports.updateService = async (req, res) => {
+// Yangilik ma'lumotlarini yangilash
+exports.updateNews = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -117,11 +115,11 @@ exports.updateService = async (req, res) => {
             })
         }
 
-        const service = await serviceModel.findById(id)
+        const news = await newsModel.findById(id)
 
-        if (!service) {
+        if (!news) {
             return res.status(404).send({
-                error: "Xizmat topilmadi!"
+                error: "Yangilik topilmadi!"
             })
         }
 
@@ -141,18 +139,18 @@ exports.updateService = async (req, res) => {
             })
         }
 
-        const updatedService = {
-            name: data.name || service.name,
-            title: data.title || service.title,
-            description: data.description || service.description
+        const updatedNews = {
+            title: data.title || news.title,
+            description: data.description || news.description
         }
 
-        await serviceModel.findByIdAndUpdate(id, updatedService)
+        await newsModel.findByIdAndUpdate(id, updatedNews)
 
         return res.status(200).send({
-            message: "Xizmat ma'lumotlari muvaffaqiyatli yangilandi!",
-            updatedService
+            message: "Yangilik ma'lumotlari muvaffaqiyatli yangilandi!",
+            updatedNews
         })
+
     } catch (error) {
         console.log(error);
         if (error.message) {
@@ -164,8 +162,8 @@ exports.updateService = async (req, res) => {
     }
 }
 
-// Xizmatni o'shirish
-exports.deleteService = async (req, res) => {
+// Yangilini o'chirish
+exports.deleteNews = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -176,18 +174,18 @@ exports.deleteService = async (req, res) => {
             })
         }
 
-        const service = await serviceModel.findById(id)
+        const news = await newsModel.findById(id)
 
-        if (!service) {
+        if (!news) {
             return res.status(404).send({
-                error: "Xizmat topilmadi!"
+                error: "Yangilik topilmadi!"
             })
         }
 
-        await serviceModel.findByIdAndDelete(id)
+        await newsModel.findByIdAndDelete(id)
 
         return res.status(200).send({
-            message: "Xizmat muvaffaqiyatli o'chirildi!"
+            message: "Yangilik muvaffaqiyatli o'chirildi!"
         })
 
     } catch (error) {

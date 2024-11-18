@@ -6,4 +6,4 @@ const staffSchema = new mongoose.Schema({
     description: String
 }, {timestamps: true})
 
-exports.workerModel = mongoose.model('Staff', staffSchema)
+exports.staffModel = mongoose.model('Staff', staffSchema)

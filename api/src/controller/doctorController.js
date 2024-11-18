@@ -14,6 +14,13 @@ exports.createDoctor = async (req, res) => {
     }
     const data = matchedData(req);
 
+    // data bo'sh emasligini tekshirish
+    if (!Object.keys(data)) {
+      return res.status(404).send({
+        error: "Ma'lumotlar topilmadi!"
+      })
+    }
+
     // Usernameni tekshirish
     const condidat = await doctorModel.findOne({ username: data.username })
     if (condidat) {
@@ -38,8 +45,8 @@ exports.createDoctor = async (req, res) => {
     })
 
     return res.status(200).send({
-      doctor,
-      message: "Doktor muvaffaqiyatli yaratildi!"
+      message: "Doktor muvaffaqiyatli yaratildi!",
+      doctor
     })
   } catch (error) {
     console.log(error);
@@ -78,7 +85,7 @@ exports.getAllDoctors = async (req, res) => {
   }
 }
 
-// Bitta doctorni olish
+// Bitta doctorni ko'rish
 exports.getOneDoctors = async (req, res) => {
   try {
     const { params: { id } } = req
@@ -113,6 +120,7 @@ exports.getOneDoctors = async (req, res) => {
   }
 }
 
+// Doctor ma'lumotlarini yangilash
 exports.updateDoctor = async (req, res) => {
   try {
     const { params: { id } } = req
@@ -141,6 +149,13 @@ exports.updateDoctor = async (req, res) => {
     }
     const data = matchedData(req);
 
+    // data bo'sh emasligini tekshirish
+    if (!Object.keys(data)) {
+      return res.status(404).send({
+        error: "Ma'lumotlar topilmadi!"
+      })
+    }
+
     const updateDoctor = {
       fullName: data.fullName || doctor.fullName,
       username: data.username || doctor.username,
@@ -155,7 +170,7 @@ exports.updateDoctor = async (req, res) => {
 
     return res.status(200).send({
       message: "Shifokor ma'lumotlari muvaffaqiyatli yangilandi!",
-      updateDoctor
+      doctor
     })
   } catch (error) {
     console.log(error);
@@ -168,6 +183,7 @@ exports.updateDoctor = async (req, res) => {
   }
 }
 
+// Doctor parolini yangilash
 exports.updatePassword = async (req, res) => {
   try {
     const { params: { id } } = req
@@ -196,6 +212,13 @@ exports.updatePassword = async (req, res) => {
     }
     const data = matchedData(req);
 
+    // data bo'sh emasligini tekshirish
+    if (!Object.keys(data)) {
+      return res.status(404).send({
+        error: "Ma'lumotlar topilmadi!"
+      })
+    }
+
     // Parolni hashlash
     const passwordHash = await bcrypt.hash(data.password, 10)
     delete data.password
@@ -209,7 +232,7 @@ exports.updatePassword = async (req, res) => {
 
     return res.status(200).send({
       message: "Shifokor paroli yangilandi!",
-      doctor: updating
+      doctor: doctor
     })
   } catch (error) {
     console.log(error);
@@ -222,6 +245,7 @@ exports.updatePassword = async (req, res) => {
   }
 }
 
+// Doctorni o'chirish
 exports.deleteDoctor = async (req, res) => {
   try {
     const { params: { id } } = req

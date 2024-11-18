@@ -5,4 +5,4 @@ const newsSchema = new mongoose.Schema({
     description: String,
 }, {timestamps: true})
 
-exports.NewsModel = mongoose.model('News', newsSchema)
+exports.newsModel = mongoose.model('News', newsSchema)
