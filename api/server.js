@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(cors())
 
 // Cookie parserni o'rnatig
-app.use(cookieParser())
+app.use(cookieParser(process.env.COOKIE_PARSER_KEY))
 
 // routerni o'rnatish
 appRouter(app)
