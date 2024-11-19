@@ -1,4 +1,4 @@
-const { newsModel } = require('../models/newsModel')
+const { newsModel } = require("../models/newsModel")
 const { validationResult, matchedData } = require('express-validator')
 
 // Yangilik yaratish
