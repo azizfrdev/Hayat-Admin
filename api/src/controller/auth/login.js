@@ -25,6 +25,8 @@ exports.login = async (req, res) => {
     }
     const data = matchedData(req);
 
+    console.log(data);
+    
     // Admin user
     let user = await adminModel.findOne({ username: data.username }).lean();
 
