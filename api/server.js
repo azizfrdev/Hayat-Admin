@@ -8,11 +8,12 @@ const cors = require('cors')
 connectDB()
 const app = express()
 
+app.use(cors())
+
 // bodyni pars qilish
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
-app.use(cors())
 
 // Cookie parserni o'rnatig
 app.use(cookieParser(process.env.COOKIE_PARSER_KEY))
