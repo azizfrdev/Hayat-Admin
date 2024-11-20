@@ -18,7 +18,22 @@ const CustomLogin = () => {
 
     return (
         <div style={styles.container}>
-            <div style={styles.card}>
+            <style>
+                {`
+                @keyframes boxShadowPulse {
+                    0% {
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    }
+                    50% {
+                        box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3);
+                    }
+                    100% {
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    }
+                }
+                `}
+            </style>
+            <div style={{ ...styles.card, animation: "boxShadowPulse 2s infinite" }}>
                 <h1 style={styles.heading}>Welcome to <span style={styles.logo}>Hayat-Admin</span></h1>
                 <p style={styles.subtitle}>Please log in to continue</p>
                 <form onSubmit={handleSubmit} style={styles.form}>
@@ -51,9 +66,10 @@ const styles = {
         justifyContent: "center",
         height: "100vh",
         backgroundColor: "#f0f8ff", // Light blue background
+        overflow: "hidden",
     },
     logo: {
-      color: "#bc1111"
+      color: "#bc1111",
     },
     card: {
         width: "400px",
@@ -96,9 +112,6 @@ const styles = {
         fontSize: "16px",
         cursor: "pointer",
         transition: "background-color 0.3s ease",
-    },
-    buttonHover: {
-        backgroundColor: "#0056b3", // Darker blue on hover
     },
     error: {
         color: "#dc3545", // Red error message
