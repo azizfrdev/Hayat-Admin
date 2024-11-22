@@ -6,6 +6,8 @@ const logoutRouter = require('./logoutRouter')
 const staffRouter = require('./staffRouter')
 const serviceRouter = require('./serviceRouter')
 const newsRouter = require('./newsRouter')
+const patientRouter = require('./patientRouter')
+const analysisRouter = require('./analysisRouter')
 
 exports.appRouter = (app) => {
     app.use('/api', loginRouter)
@@ -14,6 +16,8 @@ exports.appRouter = (app) => {
     app.use('/api', jwtAccessMiddleware, doctorRouter)
     app.use('/api', jwtAccessMiddleware, staffRouter)
     app.use('/api', jwtAccessMiddleware, serviceRouter)
-    app.use('/api', newsRouter)
+    app.use('/api', jwtAccessMiddleware, newsRouter)
+    app.use('/api', jwtAccessMiddleware, patientRouter)
+    app.use('/api', jwtAccessMiddleware, analysisRouter)
 }
 

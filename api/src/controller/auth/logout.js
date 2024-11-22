@@ -1,7 +1,6 @@
 exports.logout = (req, res) => {
   try {
     res.clearCookie("authcookie");
-    res.clearCookie("token");
 
     return res.status(200).send({
       message: "Logout muvvaffaqiyatli amalga oshirildi!"
