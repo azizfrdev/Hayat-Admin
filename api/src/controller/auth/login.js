@@ -6,10 +6,11 @@ const { doctorModel } = require('../../models/doctorModel')
 require("dotenv").config();
 
 // Token generatsiya qilish
-const generateToken = (id, role) => {
+const generateToken = (id, role, service) => {
   const payload = {
     id,
     role,
+    service
   };
   return jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "1d" });
 };
@@ -25,12 +26,9 @@ exports.login = async (req, res) => {
     }
     const data = matchedData(req);
 
-    console.log(data);
     
     // Admin user
     let user = await adminModel.findOne({ username: data.username }).lean();
-
-    console.log(user);
     
     if (user) {
       // Parol to'g'riligini tekshirish
@@ -48,7 +46,6 @@ exports.login = async (req, res) => {
 
       // Cookiega saqlash
       res.cookie("authcookie", token, { httpOnly: true });
-      res.cookie("token", userId, { httpOnly: true });
 
       return res.status(200).send({
         message: 'Login muvvaffaqiyatli amalga oshirildi!',
@@ -73,11 +70,11 @@ exports.login = async (req, res) => {
       // Token generatsiya qilish
       const userId = user._id;
       const role = user.role;
-      const token = generateToken(userId, role);
+      const service = user.service
+      const token = generateToken(userId, role, service);
 
       // Cookiega saqlash
       res.cookie("authcookie", token, { httpOnly: true });
-      res.cookie("token", userId, { httpOnly: true });
 
       return res.status(200).send({
         message: 'Login muvvaffaqiyatli amalga oshirildi!',

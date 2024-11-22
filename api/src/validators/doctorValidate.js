@@ -7,6 +7,21 @@ exports.createDoctorSchema = {
             errorMessage: "Ism talab qilinadi!"
         }
     },
+    password: {
+        isString: {
+            errorMessage: "Pareol string bo'lishi kerak!"
+        },
+        isLength: {
+            options: { min: 8 },
+            errorMessage: "Parol kamida 8 ta belgidan iborat bo'lishi kerak!"
+        },
+        notEmpty: {
+            errorMessage: "Parol talab qilinadi!"
+        },
+        trim: {
+            errorMessage: "Parol orasida ochiq joy bo'lishi mumkin emas!"
+        }
+    },
     username: {
         isString: {
             errorMessage: "Foydalanuvchi nomi string bo'lishi kerak!"
@@ -16,14 +31,6 @@ exports.createDoctorSchema = {
         },
         trim: {
             errorMessage: "Foydalanuvchi nomining orasida ochiq joy bo'lishi mumkin emas!"
-        }
-    },
-    data_of_brith: {
-        // isDate: {
-        //     errorMessage: "Tug'ilgan kun sana formatida bo'lishi kerak!"
-        // },
-        notEmpty: {
-            errorMessage: "Tug'ilgan kun talab qilinadi!"
         }
     },
     experience: {
@@ -61,6 +68,11 @@ exports.createDoctorSchema = {
             options: { min: 25, max: 250 },
             errorMessage: "Tavsif kamida 25 ta belgidan iborat bo'lishi kerak!"
         },
+    },
+    service: {
+        notEmpty: {
+            errorMessage: "Service talab qilinadi!"
+        }
     }
 }
 
@@ -97,14 +109,6 @@ exports.updateDoctorSchema = {
         },
         trim: {
             errorMessage: "Parol orasida ochiq joy bo'lishi mumkin emas!"
-        }
-    },
-    data_of_brith: {
-        // isDate: {
-        //     errorMessage: "Tug'ilgan kun sana formatida bo'lishi kerak!"
-        // },
-        notEmpty: {
-            errorMessage: "Tug'ilgan kun talab qilinadi!"
         }
     },
     experience: {

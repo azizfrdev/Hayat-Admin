@@ -16,6 +16,13 @@ exports.jwtAccessMiddleware = function (req, res, next) {
         next()
     } catch (error) {
         console.log(error);
+
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).send({
+                error: 'Token muddati tugagan. Iltimos, qayta kirish qiling!',
+            });
+        }
+
         if (error.message) {
           return res.status(400).send({
             error: error.message,

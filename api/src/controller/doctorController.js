@@ -1,5 +1,6 @@
 const { validationResult, matchedData } = require('express-validator')
 const { doctorModel } = require('../models/doctorModel')
+const { serviceModel } = require('../models/serviceModel')
 const bcrypt = require('bcrypt')
 
 // Doctor yaratish
@@ -14,13 +15,6 @@ exports.createDoctor = async (req, res) => {
     }
     const data = matchedData(req);
 
-    // data bo'sh emasligini tekshirish
-    if (!Object.keys(data)) {
-      return res.status(404).send({
-        error: "Ma'lumotlar topilmadi!"
-      })
-    }
-
     // Usernameni tekshirish
     const condidat = await doctorModel.findOne({ username: data.username })
     if (condidat) {
@@ -29,9 +23,19 @@ exports.createDoctor = async (req, res) => {
       })
     }
 
+    const serviceData = await serviceModel.findById(data.service)
+
+    
+    if (!serviceData) {
+      return  res.status(404).send({
+        error: "Xizmat topilmadi!"
+      })
+    }
+
+    
     // Parolni hashlash
-    const passwordHash = await bcrypt.hash(data.password, 10)
-    delete data.password
+    const passwordHash = await bcrypt.hash(data.password, 10) 
+    delete data.password  
 
     const doctor = await doctorModel.create({
       fullName: data.fullName,
@@ -41,7 +45,8 @@ exports.createDoctor = async (req, res) => {
       experience: data.experience,
       position: data.position,
       category: data.category,
-      description: data.description
+      description: data.description,
+      service: serviceData.name
     })
 
     return res.status(200).send({
