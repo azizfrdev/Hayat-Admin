@@ -146,5 +146,10 @@ exports.updateDoctorSchema = {
             options: { min: 25, max: 250 },
             errorMessage: "Tavsif kamida 25 ta belgidan iborat bo'lishi kerak!"
         },
+    },
+    service: {
+        notEmpty: {
+            errorMessage: "Service talab qilinadi!"
+        }
     }
 }

@@ -154,10 +154,12 @@ exports.updateDoctor = async (req, res) => {
     }
     const data = matchedData(req);
 
-    // data bo'sh emasligini tekshirish
-    if (!Object.keys(data)) {
-      return res.status(404).send({
-        error: "Ma'lumotlar topilmadi!"
+    const serviceData = await serviceModel.findById(data.service)
+
+    
+    if (!serviceData) {
+      return  res.status(404).send({
+        error: "Xizmat topilmadi!"
       })
     }
 
@@ -168,7 +170,8 @@ exports.updateDoctor = async (req, res) => {
       experience: data.experience || doctor.experience,
       position: data.position || doctor.position,
       category: data.category || doctor.category,
-      description: data.description || doctor.description
+      description: data.description || doctor.description,
+      service: serviceData.name || doctor.service
     }
 
     await doctorModel.findByIdAndUpdate(id, updateDoctor)
