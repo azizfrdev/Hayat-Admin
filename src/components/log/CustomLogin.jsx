@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import authProvider from "../authProvider";
+import authProvider from "../../authProvider";
 
 const CustomLogin = () => {
     const [username, setUsername] = useState("");
@@ -10,7 +10,7 @@ const CustomLogin = () => {
         e.preventDefault();
         try {
             await authProvider.login(username, password);
-            window.location.href = "/"; // Redirect to admin panel
+            window.location.href = "/"; 
         } catch (err) {
             setError("Invalid username or password.");
         }

@@ -1,24 +1,21 @@
 import { useMediaQuery } from "@mui/material";
-import { List, SimpleList, Datagrid, TextField, EmailField } from "react-admin";
-import MyUrlField from "../MyUrlField";
+import { List, SimpleList, Datagrid, TextField, EmailField, Edit, SearchInput } from "react-admin";
 
 export const UserList = () => {
     const isSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
     return (
-        <List>
+        <List filters={[<SearchInput source="q" alwaysOn />]}>
             {isSmall ? (
                 <SimpleList
                     primaryText={(record) => record.name}
-                    secondaryText={(record) => record.username}
+                    secondaryText={(record) => record.age}
                     tertiaryText={(record) => record.email}
                 />
             ) : (
-                <Datagrid>
-                    <TextField source="code" />
+                <Datagrid rowClick={Edit}>
                     <TextField source="name" />
+                    <TextField source="age" />
                     <EmailField source="email" />
-                    <MyUrlField source="website" />
-                    <TextField source="phone" />
                 </Datagrid>
             )}
         </List>
