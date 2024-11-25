@@ -199,3 +199,26 @@ exports.deleteStaff = async (req, res) => {
         return res.status(500).send("Serverda xatolik!");
     }
 }
+
+exports.searchStaff = async (req, res) => {
+    try {
+        const data = await staffModel.find(
+            {
+                "$or": [
+                    {fullName: {$regex: req.params.key}},
+                    {position: {$regex: req.params.key}}
+                ]
+            }
+        )
+        return res.send(data)
+
+    } catch (error) {
+        console.log(error);
+        if (error.message) {
+            return res.status(400).send({
+                error: error.message,
+            });
+        }
+        return res.status(500).send("Serverda xatolik!");
+    }
+}

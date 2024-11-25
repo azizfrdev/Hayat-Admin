@@ -4,9 +4,6 @@ const bcrypt = require('bcrypt')
 
 // admin yaratish
 exports.createAdmin = async (req, res) => {
-
-  console.log(req.body);
-  
   try {
     // error bilan ishlash
     const errors = validationResult(req);
@@ -16,13 +13,6 @@ exports.createAdmin = async (req, res) => {
       });
     }
     const data = matchedData(req);
-        
-    // data bo'sh emasligini tekshirish
-    if (!Object.keys(data)) {
-      return res.status(404).send({
-        error: "Ma'lumotlar topilmadi!"
-      })
-    }
 
     // Usernameni tekshirish
     const condidat = await adminModel.findOne({ username: data.username })

@@ -5,7 +5,8 @@ const patientSchema = new mongoose.Schema({
     age: Number,
     email: String,
     analysis: String,
-    code: String
+    orderNumber: String,
+    analysiscode: String
 })
 
 exports.patientModel = mongoose.model('Patient', patientSchema)
