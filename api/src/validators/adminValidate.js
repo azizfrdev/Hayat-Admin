@@ -1,18 +1,10 @@
 exports.createAdminSchema = {
-    firstName: {
+    name: {
         isString: {
             errorMessage: "Ism string bo'lishi kerak"
         },
         notEmpty: {
             errorMessage: "Ism talab qilinadi"
-        }
-    },
-    lastName: {
-        isString: {
-            errorMessage: "Familiya string bo'lishi kerak"
-        },
-        notEmpty: {
-            errorMessage: "Familiya talab qilinadi"
         }
     },
     username: {

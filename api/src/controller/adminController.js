@@ -38,8 +38,7 @@ exports.createAdmin = async (req, res) => {
 
 
     const admin = await adminModel.create({
-      firstName: data.firstName,
-      lastName: data.lastName,
+      name: data.firstName,
       username: data.username,
       password: passwordHash,
     });
