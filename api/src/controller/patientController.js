@@ -1,12 +1,21 @@
 const { validationResult, matchedData } = require('express-validator')
 const { patientModel } = require('../models/patientModel')
+const bcrypt = require('bcrypt')
 
 // Bemor yaratish
 exports.createPatient = async (req, res) => {
     try {
         const generateRandomCode = () => Math.floor(100000 + Math.random() * 900000);
 
+        const generateThreeDigitCode = () => Math.floor(100 + Math.random() * 900);
+
+        const ordernumber = generateThreeDigitCode()
         const code = generateRandomCode()
+
+        console.log(code);
+
+
+        const hashedcode = await bcrypt.hash(code.toString(), 10)
 
         // error bilan ishlash
         const errors = validationResult(req);
@@ -37,7 +46,8 @@ exports.createPatient = async (req, res) => {
             age: data.age,
             email: data.email,
             analysis: data.analysis,
-            code: code
+            orderNumber: ordernumber,
+            analysiscode: hashedcode
         })
 
         return res.status(200).send({
@@ -204,6 +214,30 @@ exports.deletePatient = async (req, res) => {
         return res.status(200).send({
             message: "Bemor muvaffaqiyatli o'chirildi!"
         })
+
+    } catch (error) {
+        console.log(error);
+        if (error.message) {
+            return res.status(400).send({
+                error: error.message,
+            });
+        }
+        return res.status(500).send("Serverda xatolik!");
+    }
+}
+
+exports.searchPatient = async (req, res) => {
+    try {
+        const data = await patientModel.find(
+            {
+                "$or": [
+                    {fullName: {$regex: req.params.key}},
+                    {email: {$regex: req.params.key}}
+                ]
+            }
+        )
+
+        return res.send(data)
 
     } catch (error) {
         console.log(error);

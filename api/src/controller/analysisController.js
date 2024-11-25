@@ -1,5 +1,6 @@
 const { patientModel } = require("../models/patientModel");
 const { validationResult, matchedData } =require('express-validator')
+const bcrypt = require('bcrypt')
 
 // Bemorga tahlil natijasini ko'rsatish
 exports.getAnalysis = async (req, res) => {
@@ -18,13 +19,21 @@ exports.getAnalysis = async (req, res) => {
             return res.status(404).send({
                 error: "Ma'lumotlar topilmadi!"
             })
-        }        
+        }
 
-        const result = await patientModel.findOne({code: data.code})
+        const result = await patientModel.findOne({orderNumber: data.orderNumber})
 
         if (!result) {
             return res.status(404).send({
                 error: "Natija topilmadi!"
+            })
+        }
+
+        const checkanalysiscode = await bcrypt.compare(data.analysiscode, result.analysiscode)
+
+        if (!checkanalysiscode) {
+            return res.status(401).send({
+                error: "Yozilgan kod xato!"
             })
         }
 
