@@ -1,12 +1,11 @@
 const authProvider = {
     login: async (username, password) => {
-        console.log('Username in login:', username);
-        console.log('Password in login:', password);
-
         try {
             const response = await fetch('http://localhost:3000/api/login', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`, 
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }),
