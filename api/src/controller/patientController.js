@@ -1,6 +1,8 @@
+require('dotenv').config()
 const { validationResult, matchedData } = require('express-validator')
 const { patientModel } = require('../models/patientModel')
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
 
 // Bemor yaratish
 exports.createPatient = async (req, res) => {
@@ -13,6 +15,17 @@ exports.createPatient = async (req, res) => {
         const code = generateRandomCode()
 
         console.log(code);
+
+        // Transporter sozlash (Gmail uchun)
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.User_Email,
+                pass: process.env.User_Pass
+            },
+        });
 
 
         const hashedcode = await bcrypt.hash(code.toString(), 10)
@@ -50,10 +63,121 @@ exports.createPatient = async (req, res) => {
             analysiscode: hashedcode
         })
 
-        return res.status(200).send({
-            message: "Bemor muvaffaqiyatli yaratildi!",
-            patient
-        })
+        // HTML email shabloni
+        const mailOptions = {
+            from: '"Hayat Med" <avazbekqalandarov03@gmail.com>',
+            to: 'qalandarovavazbek1@gmail.com',
+            subject: "Tasdiqlash kodi",
+            html: `
+        <html>
+<head>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6c5ce7, #0984e3);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #fff;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            color: #0984e3;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 1.6em; /* Kattalashgan matn */
+            line-height: 1.8;
+            color: #2d3436;
+            margin: 15px 0;
+        }
+
+        p strong {
+            color: #0984e3;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px; /* Telefon uchun bo‘shliqlarni kichraytirish */
+            }
+
+            h1 {
+                font-size: 2.4em; /* Telefon uchun sarlavhani kichraytirish */
+            }
+
+            p {
+                font-size: 1.4em; /* Telefon uchun matnni kichraytirish */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px; /* Yana kichik telefonlar uchun bo‘shliq */
+            }
+
+            h1 {
+                font-size: 2.2em; /* H1 kichraytirish */
+            }
+
+            p {
+                font-size: 1.3em; /* P matnini yana kichraytirish */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tasdiqlash kodi</h1>
+        <p><strong>Buyurtma raqami:</strong> ${ordernumber}</p>
+        <p><strong>Tasdiqlash kodi:</strong> ${code}</p>
+    </div>
+</body>
+</html>
+
+    `,
+        };
+
+        // Email yuborish
+        transporter.sendMail (mailOptions, (error, info) => {
+            if (error) {
+                console.log('Xatolik yuz berdi:', error);
+                return res.status(500).json({ message: 'Xatolik yuz berdi!' });
+            }
+            return res.status(200).send({
+                message: "Bemor muvaffaqiyatli yaratildi va emailga yuborldi!",
+                patient
+            })
+        });
 
     } catch (error) {
         console.log(error);
@@ -231,8 +355,8 @@ exports.searchPatient = async (req, res) => {
         const data = await patientModel.find(
             {
                 "$or": [
-                    {fullName: {$regex: req.params.key}},
-                    {email: {$regex: req.params.key}}
+                    { fullName: { $regex: req.params.key } },
+                    { email: { $regex: req.params.key } }
                 ]
             }
         )

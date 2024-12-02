@@ -34,8 +34,8 @@ exports.createAdmin = async (req, res) => {
     });
 
     return res.status(200).send({
-      admin,
       message: "Admin muvaffaqiyatli yaratildi!",
+      admin
     });
   } catch (error) {
     console.log(error);
@@ -72,6 +72,7 @@ exports.getAllAdmin = async (req, res) => {
   }
 };
 
+// Adminni o'chirish
 exports.deleteAdmin = async (req, res) => {
   try {
     const { params: { id } } = req

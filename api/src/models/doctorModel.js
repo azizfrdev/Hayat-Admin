@@ -8,6 +8,7 @@ const doctorSchema = new mongoose.Schema({
     position: String,
     category: String,
     description: String,
+    image: String,
     service: String,
     role: {type: String, default: 'doctor'}
 }, {timestamps: true})

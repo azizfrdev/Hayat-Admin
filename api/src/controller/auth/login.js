@@ -55,8 +55,6 @@ exports.login = async (req, res) => {
 
     // Doctor user
     user = await doctorModel.findOne({username: data.username})
-
-    console.log(user);
     
     if (user) {
         // Parol to'g'riligini tekshirish
