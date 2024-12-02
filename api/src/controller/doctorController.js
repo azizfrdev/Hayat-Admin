@@ -1,10 +1,19 @@
+require('dotenv').config()
 const { validationResult, matchedData } = require('express-validator')
+const { createClient } = require('@supabase/supabase-js')
 const { doctorModel } = require('../models/doctorModel')
 const { serviceModel } = require('../models/serviceModel')
 const bcrypt = require('bcrypt')
 
 // Doctor yaratish
 exports.createDoctor = async (req, res) => {
+
+  // Supabase clientni sozlash
+  const supabase = createClient(
+    process.env.Supabase_URL,
+    process.env.Supabase_KEY
+  );
+
   try {
     // error bilan ishlash
     const errors = validationResult(req);
@@ -25,28 +34,59 @@ exports.createDoctor = async (req, res) => {
 
     const serviceData = await serviceModel.findById(data.service)
 
-    
+
     if (!serviceData) {
-      return  res.status(404).send({
+      return res.status(404).send({
         error: "Xizmat topilmadi!"
       })
     }
 
+    console.log(req);
     
-    // Parolni hashlash
-    const passwordHash = await bcrypt.hash(data.password, 10) 
-    delete data.password  
+
+    if (!req.file) {
+      return res.status(400).send({
+        error: "Iltimos, rasm faylni yuklang!"
+      })
+    }
+
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedMimeTypes.includes(req.file.mimetype)) {
+      return res.status(400).send({ error: "Faqat JPG, PNG, yoki WEBP formatidagi rasmlar qabul qilinadi!" });
+    }
+
+    // Faylni Supabase storagega yuklash
+    const { buffer, originalname } = req.file;
+    const fileName = `doctors/${Date.now()}-${originalname}`;
+
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('Images') // Bu yerda bucket nomini yozing
+      .upload(fileName, buffer, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: req.file.mimetype,
+      });
+
+    if (uploadError) {
+      throw new Error(`Fayl yuklanmadi: ${uploadError.message}`);
+    }
+
+    const fileUrl = `${supabase.storageUrl}/Images/${fileName}`;
+
+    console.log(fileUrl);
+    
 
     const doctor = await doctorModel.create({
       fullName: data.fullName,
       username: data.username,
-      password: passwordHash,
-      data_of_brith: data.data_of_brith,
+      password: data.password,
       experience: data.experience,
       position: data.position,
       category: data.category,
       description: data.description,
-      service: serviceData.name
+      service: serviceData.name,
+      image: fileUrl
     })
 
     return res.status(200).send({
@@ -156,9 +196,9 @@ exports.updateDoctor = async (req, res) => {
 
     const serviceData = await serviceModel.findById(data.service)
 
-    
+
     if (!serviceData) {
-      return  res.status(404).send({
+      return res.status(404).send({
         error: "Xizmat topilmadi!"
       })
     }
@@ -295,14 +335,14 @@ exports.searchDoctors = async (req, res) => {
     const data = await doctorModel.find(
       {
         "$or": [
-          {fullName: {$regex: req.params.key}},
-          {position: {$regex: req.params.key}},
-          {service: {$regex: req.params.key}}
+          { fullName: { $regex: req.params.key } },
+          { position: { $regex: req.params.key } },
+          { service: { $regex: req.params.key } }
         ]
       }
     )
     return res.send(data)
-    
+
   } catch (error) {
     console.log(error);
     if (error.message) {

@@ -18,6 +18,7 @@ exports.jwtAccessMiddleware = function (req, res, next) {
         console.log(error);
 
         if (error.name === 'TokenExpiredError') {
+            res.clearCookie("authcookie");
             return res.status(401).send({
                 error: 'Token muddati tugagan. Iltimos, qayta kirish qiling!',
             });
