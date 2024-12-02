@@ -74,11 +74,6 @@ exports.createDoctorSchema = {
             errorMessage: "Service talab qilinadi!"
         }
     },
-    image: {
-        notEmpty: {
-            errorMessage: "Rasm tlab qilinadi!"
-        }
-    }
 }
 
 exports.updateDoctorSchema = {
