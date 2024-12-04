@@ -46,7 +46,8 @@ exports.login = async (req, res) => {
       const token = generateToken(userId, role);
 
       // Cookiega saqlash
-      res.cookie("authcookie", token, { httpOnly: true });
+      res.cookie("authcookie", token, { httpOnly: true, secure: false,
+      sameSite: 'Lax',});
 
       return res.status(200).send({
         message: 'Login muvvaffaqiyatli amalga oshirildi!',

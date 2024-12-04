@@ -1,11 +1,11 @@
 const authProvider = {
+    // Login
     login: async (username, password) => {
         try {
             const response = await fetch('http://localhost:3000/api/login', {
                 method: 'POST',
-                credentials: 'include',
+                credentials: 'include', // Send cookies with the request
                 headers: {
-                    Authorization: `${localStorage.getItem('authToken')}`, 
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }),
@@ -16,11 +16,7 @@ const authProvider = {
                 console.log('Response Data:', data);
 
                 if (!data.error) {
-                    // Store the authentication token in localStorage or cookies
-                    localStorage.setItem('authToken', data.token);
-
-                    // Resolve the promise (React-Admin will redirect the user)
-                    return Promise.resolve();
+                    return Promise.resolve(); // muvaffaqiyatli
                 } else {
                     return Promise.reject(new Error(data.error));
                 }
@@ -32,15 +28,32 @@ const authProvider = {
             return Promise.reject(error);
         }
     },
+    // Logout
     logout: () => {
-        localStorage.removeItem('authToken');
-        return Promise.resolve();
+        return fetch('http://localhost:3000/api/logout', {
+            method: 'POST',
+            credentials: 'include',
+        }).then(() => {
+            return Promise.resolve();
+        });
     },
+    // Authorni tekshirish
     checkAuth: () => {
-        return localStorage.getItem('authToken')
-            ? Promise.resolve()
-            : Promise.reject({ redirectTo: '/login' });
+        return fetch('http://localhost:3000/api/check-auth', {
+            method: 'GET',
+            credentials: 'include', 
+        }).then((response) => {
+            if (response.ok) {
+                return Promise.resolve();
+            } else {
+                return Promise.reject({ redirectTo: '/login' });
+            }
+        }).catch((error) => {
+            console.error('CheckAuth error:', error);
+            return Promise.reject({ redirectTo: '/login' });
+        });
     },
+    
     checkError: (error) => Promise.resolve(),
     getPermissions: () => Promise.resolve(),
 };
