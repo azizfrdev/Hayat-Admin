@@ -2,7 +2,6 @@ const { adminModel } = require("../models/adminModel");
 const { validationResult, matchedData } = require('express-validator')
 const bcrypt = require('bcrypt')
 
-// admin yaratish
 exports.createAdmin = async (req, res) => {
 
   console.log(req.body);
@@ -38,7 +37,7 @@ exports.createAdmin = async (req, res) => {
 
 
     const admin = await adminModel.create({
-      name: data.firstName,
+      name: data.name,
       username: data.username,
       password: passwordHash,
     });
@@ -58,7 +57,6 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
-// barcha adminlarni ko'rish
 exports.getAllAdmin = async (req, res) => {
   try {
     const admins = await adminModel.find();
