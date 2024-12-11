@@ -10,5 +10,4 @@ router
 .get('/admins', roleAccessMiddleware('admin'), getAllAdmin)
 .post('/admin/:id/delete', roleAccessMiddleware('admin'), deleteAdmin)
 
-
 module.exports = router

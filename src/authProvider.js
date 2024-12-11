@@ -1,48 +1,43 @@
+import axios from "axios";
+
 const authProvider = {
+    // 📘 **Login**
     login: async (username, password) => {
         try {
-            const response = await fetch('http://localhost:3000/api/login', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    Authorization: `${localStorage.getItem('authToken')}`, 
-                    'Content-Type': 'application/json',
+            const response = await axios.post(
+                "http://localhost:3000/api/login",
+                { username, password },
+                {
+                    headers: { "Content-Type": "application/json" },
                 },
-                body: JSON.stringify({ username, password }),
-            });
+            );
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Response Data:', data);
-
-                if (!data.error) {
-                    // Store the authentication token in localStorage or cookies
-                    localStorage.setItem('authToken', data.token);
-
-                    // Resolve the promise (React-Admin will redirect the user)
-                    return Promise.resolve();
-                } else {
-                    return Promise.reject(new Error(data.error));
-                }
-            } else {
-                return Promise.reject(new Error('Login failed!'));
-            }
+            const token = response.data.token; // Extract token from response
+            localStorage.setItem("authToken", token); // Save token to localStorage
+            console.log("Token saved:", token);
+            return Promise.resolve();
         } catch (error) {
-            console.error('Error details:', error);
-            return Promise.reject(error);
+            console.error("Login error:", error);
+            return Promise.reject(new Error("Login failed"));
         }
     },
-    logout: () => {
-        localStorage.removeItem('authToken');
-        return Promise.resolve();
+
+    // 📘 **Logout**
+    logout: async () => {
+        try {
+            await axios.post("http://localhost:3000/api/logout", null, {
+                withCredentials: true,
+            });
+            return Promise.resolve();
+        } catch (error) {
+            console.error("Logout error:", error);
+            return Promise.reject(new Error("Logout failed"));
+        }
     },
-    checkAuth: () => {
-        return localStorage.getItem('authToken')
-            ? Promise.resolve()
-            : Promise.reject({ redirectTo: '/login' });
-    },
-    checkError: (error) => Promise.resolve(),
-    getPermissions: () => Promise.resolve(),
+
+    // 📘 **Check Authentication**
+    checkAuth: () => Promise.resolve(),
+    checkError: () => Promise.resolve(),
 };
 
 export default authProvider;

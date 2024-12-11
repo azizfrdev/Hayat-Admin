@@ -1,22 +1,35 @@
-const jwt = require('jsonwebtoken')
-require('dotenv').config()
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 exports.jwtAccessMiddleware = function (req, res, next) {
     try {
-        const token = req.cookies.authcookie
+        // Authorization headerdan tokenni olish
+        const authHeader = req.headers['authorization'];
+
+        if (!authHeader) {
+            return res.status(404).send({
+                error: 'Token not found',
+            });
+        }
+
+        // "Bearer <token>" formatidan tokenni ajratib olish
+        const token = authHeader.split(' ')[1];
 
         if (!token) {
             return res.status(404).send({
-                error: 'Token not found'
-            })
+                error: 'Token not provided',
+            });
         }
 
-        const user = jwt.verify(token, process.env.JWT_KEY)
+        // Tokenni tekshirish va foydalanuvchi ma'lumotlarini olish
+        const user = jwt.verify(token, process.env.JWT_KEY);
+      
 
-        next()
+        next(); // Keyingi middleware yoki marshrutga o‘tish
     } catch (error) {
         console.log(error);
 
+        // Token muddati tugagan holatni qayta ishlash
         if (error.name === 'TokenExpiredError') {
             res.clearCookie("authcookie");
             return res.status(401).send({
@@ -24,11 +37,13 @@ exports.jwtAccessMiddleware = function (req, res, next) {
             });
         }
 
+        // Token bilan bog‘liq boshqa xatoliklar
         if (error.message) {
-          return res.status(400).send({
-            error: error.message,
-          });
+            return res.status(400).send({
+                error: error.message,
+            });
         }
-        return res.status(500).send("Serverda xatolik!"); 
+
+        return res.status(500).send("Serverda xatolik!");
     }
-}
+};
