@@ -73,39 +73,55 @@ exports.getAllAdmin = async (req, res) => {
 // Adminni o'chirish
 exports.deleteAdmin = async (req, res) => {
   try {
-    const { params: { id } } = req
+    const { body: { ids } } = req;
 
-    // Checking id to valid.
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    // Tekshirish: IDlar ro'yxati mavjudligini va to'g'riligini tasdiqlash
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
       return res.status(400).send({
-        error: "ID haqiqiy emas!"
-      })
+        error: "IDlar ro'yxati noto'g'ri yoki bo'sh!"
+      });
     }
 
-    const admin = await adminModel.findById(id)
-
-    if (!admin) {
-      return res.status(404).send({
-        error: "Admin topilmadi!"
-      })
+    // Har bir ID uchun validatsiya
+    const invalidIds = ids.filter(id => !id.match(/^[0-9a-fA-F]{24}$/));
+    if (invalidIds.length > 0) {
+      return res.status(400).send({
+        error: `Quyidagi IDlar noto'g'ri: ${invalidIds.join(", ")}`
+      });
     }
 
-    await adminModel.findByIdAndDelete(id)
+    if (ids.length === 1) {
+      // Agar bitta ID yuborilgan bo'lsa, deleteOne ishlatiladi
+      const admin = await adminModel.findById(ids[0]);
 
-    return res.status(200).send({
-      message: "Admin muvaffaqiyatli o'chirildi!"
-    })
+      if (!admin) {
+        return res.status(404).send({
+          error: "Admin topilmadi!"
+        });
+      }
 
+      await adminModel.findByIdAndDelete(ids[0]);
+
+      return res.status(200).send({
+        message: "Admin muvaffaqiyatli o'chirildi!"
+      });
+    } else {
+      // Agar bir nechta ID yuborilgan bo'lsa, deleteMany ishlatiladi
+      const result = await adminModel.deleteMany({ _id: { $in: ids } });
+
+      return res.status(200).send({
+        message: `${result.deletedCount} ta admin muvaffaqiyatli o'chirildi!`
+      });
+    }
   } catch (error) {
     console.log(error);
     if (error.message) {
       return res.status(400).send({
-        error: error.message
-      })
+        error: error.message,
+      });
     }
-
     return res.status(500).send({
-      error: "Serverda xatolik!"
-    })
+      error: error.message || "Serverda xatolik yuz berdi!"
+    });
   }
-}
+};
