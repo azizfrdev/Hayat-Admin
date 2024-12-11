@@ -8,6 +8,6 @@ const router = require('express').Router()
 router
 .post('/admin-create', roleAccessMiddleware('admin'), checkSchema(createAdminSchema), createAdmin)
 .get('/admins', roleAccessMiddleware('admin'), getAllAdmin)
-.post('/admin/:id/delete', roleAccessMiddleware('admin'), deleteAdmin)
+.post('/admins/delete', roleAccessMiddleware('admin'), deleteAdmin)
 
 module.exports = router
