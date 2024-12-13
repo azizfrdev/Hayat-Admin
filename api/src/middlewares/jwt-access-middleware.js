@@ -27,11 +27,8 @@ exports.jwtAccessMiddleware = function (req, res, next) {
 
         next(); // Keyingi middleware yoki marshrutga o‘tish
     } catch (error) {
-        console.log(error);
-
         // Token muddati tugagan holatni qayta ishlash
         if (error.name === 'TokenExpiredError') {
-            res.clearCookie("authcookie");
             return res.status(401).send({
                 error: 'Token muddati tugagan. Iltimos, qayta kirish qiling!',
             });
