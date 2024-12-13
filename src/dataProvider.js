@@ -4,6 +4,7 @@ const apiUrl = "http://localhost:3000/api";
 const token = localStorage.getItem("authToken");
 
 const dataProvider = {
+  // Adminlar ro'yhatini UIga chiqarish
   getList: async () => {
     const url = `${apiUrl}/admins`;
 
@@ -30,9 +31,6 @@ const dataProvider = {
 
   // 📘 **Create New Admin**
   create: async (data) => {
-
-    console.log("Received params:", data); // {name,username,password}
-
     const { name, username, password } = data;
   
     if (!name || !username || !password) {
@@ -42,8 +40,6 @@ const dataProvider = {
 
     const token = localStorage.getItem("authToken");
     const url1 = `${apiUrl}/admin-create`;
-  
-    console.log('Admin data being sent:', { name, username, password });
   
     try {
       const response = await axios.post(url1, { 
@@ -58,16 +54,51 @@ const dataProvider = {
   
       console.log('Response data:', response.data);
   
-      if (response.data && response.data.id) {
-        return { data: { ...params, id: response.data.id } };
+      if ((response.status === 200 || response.status === 201) && response.data) {
+        // Check for admin ID from multiple possible locations
+        const adminId = response.data.id || response.data._id || response.data.admin?.id || response.data.admin?._id;
+        if (adminId) {
+          return { data: { ...data, id: adminId } };
+        } else {
+          return Promise.reject(new Error("Failed to create admin: missing ID in response."));
+        }
       } else {
-        return Promise.reject(new Error("Failed to create admin."));
+        return Promise.reject(new Error("Failed to create admin: unexpected status."));
       }
     } catch (error) {
       console.error("Create error:", error);
       return Promise.reject(new Error("Failed to create resource."));
     }
-  }  
+  },
+
+  delete: async (resource, params) => { 
+    const { id } = params;  
+  
+    if (resource === 'admins' && id) {
+      const url = `${apiUrl}/admin/${id}/delete`;  // Construct the URL with the admin ID to delete
+  
+      try {
+        const token = localStorage.getItem("authToken");  // Get the token from localStorage
+  
+        // Send DELETE request to backend
+        const response = await axios.delete(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Attach the token in the headers
+          },
+        });
+  
+        if (response.status === 200) {
+          return { data: {} };  // Return an empty object since the admin was deleted
+        } else {
+          return Promise.reject(new Error('Failed to delete admin.'));
+        }
+      } catch (error) {
+        console.error('Error deleting admin:', error);
+        return Promise.reject(new Error('Failed to delete admin.'));
+      }
+    }
+  }
+  
 };
 
 export default dataProvider;
