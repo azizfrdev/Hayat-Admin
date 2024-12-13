@@ -73,55 +73,35 @@ exports.getAllAdmin = async (req, res) => {
 // Adminni o'chirish
 exports.deleteAdmin = async (req, res) => {
   try {
-    const { body: { ids } } = req;
+    const { id } = req.params;  // Get the ID from the URL params
 
-    // Tekshirish: IDlar ro'yxati mavjudligini va to'g'riligini tasdiqlash
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    // Validate the ID format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).send({
-        error: "IDlar ro'yxati noto'g'ri yoki bo'sh!"
+        error: "Invalid ID format!"  // Improved error message
       });
     }
 
-    // Har bir ID uchun validatsiya
-    const invalidIds = ids.filter(id => !id.match(/^[0-9a-fA-F]{24}$/));
-    if (invalidIds.length > 0) {
-      return res.status(400).send({
-        error: `Quyidagi IDlar noto'g'ri: ${invalidIds.join(", ")}`
+    const admin = await adminModel.findById(id);  // Find admin by ID
+
+    if (!admin) {
+      return res.status(404).send({
+        error: "Admin not found!"  // Improved error message
       });
     }
 
-    if (ids.length === 1) {
-      // Agar bitta ID yuborilgan bo'lsa, deleteOne ishlatiladi
-      const admin = await adminModel.findById(ids[0]);
+    await adminModel.findByIdAndDelete(id);  // Delete admin by ID
 
-      if (!admin) {
-        return res.status(404).send({
-          error: "Admin topilmadi!"
-        });
-      }
-
-      await adminModel.findByIdAndDelete(ids[0]);
-
-      return res.status(200).send({
-        message: "Admin muvaffaqiyatli o'chirildi!"
-      });
-    } else {
-      // Agar bir nechta ID yuborilgan bo'lsa, deleteMany ishlatiladi
-      const result = await adminModel.deleteMany({ _id: { $in: ids } });
-
-      return res.status(200).send({
-        message: `${result.deletedCount} ta admin muvaffaqiyatli o'chirildi!`
-      });
-    }
+    return res.status(200).send({
+      message: "Admin deleted successfully!"  // Success message
+    });
   } catch (error) {
-    console.log(error);
-    if (error.message) {
-      return res.status(400).send({
-        error: error.message,
-      });
-    }
+    console.error(error);
     return res.status(500).send({
-      error: error.message || "Serverda xatolik yuz berdi!"
+      error: error.message || "An error occurred while deleting the admin!"  // Handle unexpected errors
     });
   }
 };
+
+
+
