@@ -45,10 +45,6 @@ exports.login = async (req, res) => {
       const role = user.role;
       const token = generateToken(userId, role);
 
-      // Cookiega saqlash
-      res.cookie("authcookie", token, { httpOnly: true, secure: false,
-      sameSite: 'Lax',});
-
       return res.status(200).send({
         message: 'Login muvvaffaqiyatli amalga oshirildi!',
         token: token
@@ -73,9 +69,7 @@ exports.login = async (req, res) => {
       const service = user.service
       const token = generateToken(userId, role, service);
       console.log(token);
-      // Cookiega saqlash
-      res.cookie("authcookie", token, { httpOnly: true });
-
+     
       return res.status(200).send({
         message: 'Login muvvaffaqiyatli amalga oshirildi!',
         token: token
