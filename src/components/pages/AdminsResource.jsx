@@ -9,7 +9,7 @@ import {
     useRedirect,
     useListContext,
 } from "react-admin";
-import dataProvider from "../../dataProvider";
+import dataProvider from "../../providers/dataProvider";
 import AdminsDelete from "../delete/AdminsDelete";
 
 export const AdminList = (props) => {
@@ -26,14 +26,13 @@ const AdminListContent = () => {
     return (
         <div className="">
             {data?.map((el) => {
-                return <AdminsDelete key={el.id} {...el} />;
+                return <AdminsDelete key={el.id} data={el} />;
             })}
         </div>
     );
 };
 
 const AdminCreate = (props) => {
-    console.log("Props inside AdminCreate", props);
     const notify = useNotify();
     const redirect = useRedirect();
 
@@ -49,7 +48,7 @@ const AdminCreate = (props) => {
                 error.response ? error.response.data : error.message,
             );
             const errorMessage =
-                error.response?.data?.message || "Error creating admin!";
+                error.response?.data?.message || "Error creating admin!"; 
             notify(errorMessage, { type: "error" });
         }
     };

@@ -1,12 +1,12 @@
 import React from "react";
 import { Admin, EditGuesser, Resource, ShowGuesser } from "react-admin";
-import dataProvider from './dataProvider';
+import dataProvider from './providers/dataProvider';
 import { PostEdit, PostList, PostCreate } from "./components/pages/posts";
 import { UserList } from "./components/pages/users";
 import PostIcon from "@mui/icons-material/Book";
 import UserIcon from "@mui/icons-material/Group";
 import CommentIcon from "@mui/icons-material/Comment";
-import authProvider from "./authProvider";
+import authProvider from "./providers/authProvider";
 import CustomLogin from "./components/log/CustomLogin";
 import { AdminList } from "./components/pages/AdminsResource";
 import AdminCreate from "./components/pages/AdminsResource";

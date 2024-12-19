@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import authProvider from "../../authProvider";
+import authProvider from "../../providers/authProvider";
 
 const CustomLogin = () => {
     const [username, setUsername] = useState("");
