@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Button, useNotify, useRefresh } from 'react-admin';
-import dataProvider from '../../dataProvider'; 
+import dataProvider from '../../providers/dataProvider'; 
+import ConfirmationModal from './Confirm';
 
 const CustomDeleteButton = ({ id }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const notify = useNotify();
   const refresh = useRefresh();
 
@@ -13,10 +15,9 @@ const CustomDeleteButton = ({ id }) => {
     }
 
     try {
-      // Send the DELETE request using the correct method
-      await dataProvider.delete('admins', { id });  // Send id directly (not in array)
+      await dataProvider.delete('admins', { id });
       notify('Admin deleted successfully!', { type: 'success' });
-      refresh(); // Refresh the list after deletion
+      refresh(); 
     } catch (error) {
       console.error('Error deleting admin:', error);
       notify('Error deleting admin!', { type: 'error' });
@@ -24,9 +25,15 @@ const CustomDeleteButton = ({ id }) => {
   };
 
   return (
-    <Button label="Delete" onClick={handleDelete}>
-      Delete
-    </Button>
+    <>
+    <Button label="Delete" onClick={() => setIsModalOpen(true)}></Button>
+    <ConfirmationModal 
+        message="Do you want to delete it?" 
+        isOpen={isModalOpen} 
+        onConfirm={handleDelete} 
+        onCancel={() => setIsModalOpen(false)} 
+      />
+    </>
   );
 };
 

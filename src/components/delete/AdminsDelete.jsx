@@ -1,15 +1,37 @@
 import React from 'react';
 import CustomDeleteButton from '../buttons/CustomDeleteBtn';
 
-const AdminsDelete = ({ id, username, name }) => {
+const AdminsDelete = ({data}) => {
+  console.log(data);
+
+  const {username, id,name} = data
+
+  console.log(name);
+
   return (
-    <div style={{ display: 'flex', padding: 30 }}>
-      <div>{id}</div>
-      <div>{username}</div>
-      <div>{name}</div>
-      <CustomDeleteButton id={id} />
+    <div style={styles.tableRow}>
+      <div style={styles.tableCell}>{username}</div>
+      <div style={styles.tableCell}>{name}</div>
+      <div style={styles.tableCell}>
+        <CustomDeleteButton id={id} />
+      </div>
     </div>
   );
 };
 
-export default AdminsDelete
+const styles = {
+  tableRow: {
+    display: 'flex',
+    padding: '10px 20px',
+    borderBottom: '1px solid #ccc',  
+    alignItems: 'center',
+  },
+  tableCell: {
+    flex: 1, 
+    padding: '10px',
+    textAlign: 'center',  
+    fontSize: '16px',
+  },
+};
+
+export default AdminsDelete;

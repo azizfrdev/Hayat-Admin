@@ -4,7 +4,7 @@ const apiUrl = "http://localhost:3000/api";
 const token = localStorage.getItem("authToken");
 
 const dataProvider = {
-  // Adminlar ro'yhatini UIga chiqarish
+  // Admins displayed to UI
   getList: async () => {
     const url = `${apiUrl}/admins`;
 
@@ -29,7 +29,7 @@ const dataProvider = {
     }
   },
 
-  // 📘 **Create New Admin**
+  // Create New Admin
   create: async (data) => {
     const { name, username, password } = data;
   
@@ -71,6 +71,7 @@ const dataProvider = {
     }
   },
 
+  // Delete Admins
   delete: async (resource, params) => { 
     const { id } = params;  
   
@@ -98,7 +99,6 @@ const dataProvider = {
       }
     }
   }
-  
 };
 
 export default dataProvider;
