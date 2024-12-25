@@ -11,11 +11,11 @@ const router = require('express').Router()
 
 router
 .get('/doctor-search/:key', roleAccessMiddleware('admin'), searchDoctors)
-.post('/doctor-create', roleAccessMiddleware('admin'), checkSchema(createDoctorSchema), upload.single('image'), createDoctor)
+.post('/doctor-create', roleAccessMiddleware('admin'), upload.single('image'), checkSchema(createDoctorSchema), createDoctor)
 .get('/doctors', roleAccessMiddleware('admin'), getAllDoctors)
 .get('/doctor/:id', roleAccessMiddleware('admin'), getOneDoctors)
-.post('/doctor/:id/update', roleAccessMiddleware('admin'), checkSchema(updateDoctorSchema), updateDoctor)
-.post('/doctor/:id/update-password', roleAccessMiddleware('admin'), checkSchema(updatePasswordSchema), updatePassword)
-.post('/doctor/:id/delete', roleAccessMiddleware('admin'), deleteDoctor)
+.put('/doctor/:id/update', roleAccessMiddleware('admin'), upload.single('image'), checkSchema(updateDoctorSchema), updateDoctor)
+.put('/doctor/:id/update-password', roleAccessMiddleware('admin'), checkSchema(updatePasswordSchema), updatePassword)
+.delete('/doctor/:id/delete', roleAccessMiddleware('admin'), deleteDoctor)
 
 module.exports = router

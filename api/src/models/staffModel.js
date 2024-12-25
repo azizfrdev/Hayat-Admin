@@ -1,9 +1,17 @@
 const mongoose = require('mongoose')
 
 const staffSchema = new mongoose.Schema({
-    fullName: String,
-    position: String,
-    description: String
+    uz_name: String,
+    ru_name: String,
+    en_name: String,
+
+    uz_position: String,
+    ru_position: String,
+    en_position: String,
+    
+    uz_description: String,
+    ru_description: String,
+    en_description: String
 }, {timestamps: true})
 
 exports.staffModel = mongoose.model('Staff', staffSchema)

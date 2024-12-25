@@ -19,5 +19,11 @@ exports.appRouter = (app) => {
     app.use('/api', jwtAccessMiddleware, newsRouter)
     app.use('/api', jwtAccessMiddleware, patientRouter)
     app.use('/api', jwtAccessMiddleware, analysisRouter)
+    
+    app.use((req, res) => {
+        return res.status(404).send({
+            error: "Page not found"
+        })
+    })
 }
 

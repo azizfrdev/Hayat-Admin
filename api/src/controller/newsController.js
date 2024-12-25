@@ -13,16 +13,14 @@ exports.createNews = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const news = await newsModel.create({
-            title: data.title,
-            description: data.description
+            uz_title: data.uz_title,
+            ru_title: data.ru_title,
+            en_title: data.en_title,
+
+            uz_description: data.uz_description,
+            ru_description: data.ru_description,
+            en_description: data.en_description
         })
 
         return res.status(200).send({
@@ -132,16 +130,14 @@ exports.updateNews = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const updatedNews = {
-            title: data.title || news.title,
-            description: data.description || news.description
+            uz_title: data.uz_title || news.uz_title,
+            ru_title: data.ru_title || news.ru_title,
+            en_title: data.en_title || news.en_title,
+
+            uz_description: data.uz_description || news.uz_description,
+            ru_description: data.ru_description || news.ru_description,
+            en_description: data.en_description || news.en_description
         }
 
         await newsModel.findByIdAndUpdate(id, updatedNews)
