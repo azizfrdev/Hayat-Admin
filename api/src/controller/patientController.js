@@ -39,13 +39,6 @@ exports.createPatient = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const condidat = await patientModel.findOne({ email: data.email })
 
         if (condidat) {
@@ -55,7 +48,9 @@ exports.createPatient = async (req, res) => {
         }
 
         const patient = await patientModel.create({
-            fullName: data.fullName,
+            uz_name: data.uz_name,
+            ru_name: data.ru_name,
+            en_name: data.en_name,
             age: data.age,
             email: data.email,
             analysis: data.analysis,
@@ -281,15 +276,10 @@ exports.updatedPateint = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const updatedPateint = {
-            fullName: data.fullName || patient.fullName,
+            uz_name: data.uz_name || patient.uz_name,
+            ru_name: data.ru_name || patient.ru_name,
+            en_name: data.en_name || patient.en_name,
             age: data.age || patient.age,
             email: data.email || patient.email,
             analysis: data.analysis || patient.analysis

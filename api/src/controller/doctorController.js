@@ -1,19 +1,18 @@
-require('dotenv').config()
-const { validationResult, matchedData } = require('express-validator')
-const { createClient } = require('@supabase/supabase-js')
-const { doctorModel } = require('../models/doctorModel')
-const { serviceModel } = require('../models/serviceModel')
-const bcrypt = require('bcrypt')
+require("dotenv").config();
+const { validationResult, matchedData } = require("express-validator");
+const { createClient } = require("@supabase/supabase-js");
+const { doctorModel } = require("../models/doctorModel");
+const { serviceModel } = require("../models/serviceModel");
+const bcrypt = require("bcrypt");
+
+// Supabase clientni sozlash
+const supabase = createClient(
+  process.env.Supabase_URL,
+  process.env.Supabase_KEY,
+);
 
 // Doctor yaratish
 exports.createDoctor = async (req, res) => {
-
-  // Supabase clientni sozlash
-  const supabase = createClient(
-    process.env.Supabase_URL,
-    process.env.Supabase_KEY
-  );
-
   try {
     // error bilan ishlash
     const errors = validationResult(req);
@@ -25,45 +24,35 @@ exports.createDoctor = async (req, res) => {
     const data = matchedData(req);
 
     // Usernameni tekshirish
-    const condidat = await doctorModel.findOne({ username: data.username })
+    const condidat = await doctorModel.findOne({ username: data.username });
     if (condidat) {
       return res.status(400).send({
-        error: "Bunday foydalanuvchi nomi allaqachon bor!"
-      })
+        error: "Bunday foydalanuvchi nomi allaqachon bor!",
+      });
     }
 
-    const serviceData = await serviceModel.findById(data.service)
-
+    const serviceData = await serviceModel.findById(data.service);
 
     if (!serviceData) {
       return res.status(404).send({
-        error: "Xizmat topilmadi!"
-      })
+        error: "Xizmat topilmadi!",
+      });
     }
-
-    console.log(req);
-    
 
     if (!req.file) {
       return res.status(400).send({
-        error: "Iltimos, rasm faylni yuklang!"
-      })
-    }
-
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedMimeTypes.includes(req.file.mimetype)) {
-      return res.status(400).send({ error: "Faqat JPG, PNG, yoki WEBP formatidagi rasmlar qabul qilinadi!" });
+        error: "Iltimos, rasm faylni yuklang!",
+      });
     }
 
     // Faylni Supabase storagega yuklash
     const { buffer, originalname } = req.file;
     const fileName = `doctors/${Date.now()}-${originalname}`;
 
-    const { data: uploadData, error: uploadError } = await supabase
-      .storage
-      .from('Images') // Bu yerda bucket nomini yozing
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("Images") // Bu yerda bucket nomini yozing
       .upload(fileName, buffer, {
-        cacheControl: '3600',
+        cacheControl: "3600",
         upsert: false,
         contentType: req.file.mimetype,
       });
@@ -72,27 +61,40 @@ exports.createDoctor = async (req, res) => {
       throw new Error(`Fayl yuklanmadi: ${uploadError.message}`);
     }
 
-    const fileUrl = `${supabase.storageUrl}/Images/${fileName}`;
-
-    console.log(fileUrl);
-    
+    const fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
 
     const doctor = await doctorModel.create({
-      fullName: data.fullName,
+      uz_name: data.uz_name,
+      ru_name: data.ru_name,
+      en_name: data.en_name,
+
       username: data.username,
       password: data.password,
-      experience: data.experience,
-      position: data.position,
-      category: data.category,
-      description: data.description,
-      service: serviceData.name,
-      image: fileUrl
-    })
+
+      uz_experience: data.uz_experience,
+      ru_experience: data.ru_experience,
+      en_experience: data.en_experience,
+
+      uz_position: data.uz_position,
+      ru_position: data.ru_position,
+      en_position: data.en_position,
+
+      uz_category: data.uz_category,
+      ru_category: data.ru_category,
+      en_category: data.en_category,
+
+      uz_description: data.uz_description,
+      ru_description: data.ru_description,
+      en_description: data.en_description,
+
+      service: serviceData.uz_name,
+      image: fileUrl,
+    });
 
     return res.status(200).send({
       message: "Doktor muvaffaqiyatli yaratildi!",
-      doctor
-    })
+      doctor,
+    });
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -102,23 +104,23 @@ exports.createDoctor = async (req, res) => {
     }
     return res.status(500).send("Serverda xatolik!");
   }
-}
+};
 
 // Hamma doctorlarni ko'rish
 exports.getAllDoctors = async (req, res) => {
   try {
-    const doctors = await doctorModel.find()
+    const doctors = await doctorModel.find();
 
     if (!doctors) {
       return res.status(404).send({
-        error: "Shifokorlar topilmadi!"
-      })
+        error: "Shifokorlar topilmadi!",
+      });
     }
 
     return res.status(200).send({
       message: "Shifokorlar ro'yxati!",
-      doctors
-    })
+      doctors,
+    });
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -128,31 +130,33 @@ exports.getAllDoctors = async (req, res) => {
     }
     return res.status(500).send("Serverda xatolik!");
   }
-}
+};
 
 // Bitta doctorni ko'rish
 exports.getOneDoctors = async (req, res) => {
   try {
-    const { params: { id } } = req
+    const {
+      params: { id },
+    } = req;
 
     // Checking id to valid.
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).send({
-        error: "ID haqiqiy emas!"
-      })
+        error: "ID haqiqiy emas!",
+      });
     }
 
-    const doctor = await doctorModel.findById(id)
+    const doctor = await doctorModel.findById(id);
 
     if (!doctor) {
       return res.status(404).send({
-        error: "Shifikor topilmadi!"
-      })
+        error: "Shifikor topilmadi!",
+      });
     } else {
       return res.status(200).send({
         message: "Shifokor",
-        doctor
-      })
+        doctor,
+      });
     }
   } catch (error) {
     console.log(error);
@@ -163,26 +167,26 @@ exports.getOneDoctors = async (req, res) => {
     }
     return res.status(500).send("Serverda xatolik!");
   }
-}
+};
 
 // Doctor ma'lumotlarini yangilash
 exports.updateDoctor = async (req, res) => {
   try {
-    const { params: { id } } = req
+    const { params: { id }, } = req;
 
-    // Checking id to valid.
+    // ID ni tekshirish
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).send({
-        error: "ID haqiqiy emas!"
-      })
+        error: "ID haqiqiy emas!",
+      });
     }
 
-    const doctor = await doctorModel.findById(id)
+    const doctor = await doctorModel.findById(id);
 
     if (!doctor) {
       return res.status(404).send({
-        error: "Shifikor topilmadi!"
-      })
+        error: "Shifikor topilmadi!",
+      });
     }
 
     // error bilan ishlash
@@ -194,32 +198,104 @@ exports.updateDoctor = async (req, res) => {
     }
     const data = matchedData(req);
 
-    const serviceData = await serviceModel.findById(data.service)
+    const serviceData = await serviceModel.findById(data.service);
 
 
     if (!serviceData) {
       return res.status(404).send({
-        error: "Xizmat topilmadi!"
+        error: "Xizmat topilmadi!",
+      });
+    }
+
+    let fileUrl = doctor.image; // Mavjud rasmni saqlash    
+
+    if (req.file) {
+      try {
+        if (fileUrl) {
+          const filePath = fileUrl.replace(`${supabase.storageUrl}/object/public/Images/`, '');
+    
+          // Faylning mavjudligini tekshirish
+          const { data: fileExists, error: checkError } = await supabase
+            .storage
+            .from('Images')
+            .list('', { prefix: filePath });
+    
+          if (checkError) {
+            console.error(`Fayl mavjudligini tekshirishda xatolik: ${checkError.message}`);
+          } else if (fileExists && fileExists.length > 0) {
+            // Faylni o‘chirish
+            const { error: deleteError } = await supabase
+              .storage
+              .from('Images')
+              .remove([filePath]);
+    
+            if (deleteError) {
+              throw new Error(`Faylni o'chirishda xatolik: ${deleteError.message}`);
+            } 
+          }
+        }
+    
+        // Yangi faylni yuklash
+        const { buffer, originalname } = req.file;
+        const fileName = `doctors/${Date.now()}-${originalname}`;
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('Images')
+          .upload(fileName, buffer, {
+            cacheControl: '3600',
+            upsert: true,
+            contentType: req.file.mimetype,
+          });
+    
+        if (uploadError) {
+          throw new Error(`Fayl yuklanmadi: ${uploadError.message}`);
+        }
+    
+        fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
+      } catch (err) {
+        console.error(`Faylni yangilashda xatolik: ${err.message}`);
+        throw new Error("Yangi faylni yuklash yoki eski faylni o‘chirishda muammo!");
+      }
+    } else {
+      return res.status(404).send({
+        error: "File topilmadi!"
       })
     }
 
+    // Doktorni yangilash
     const updateDoctor = {
-      fullName: data.fullName || doctor.fullName,
-      username: data.username || doctor.username,
-      data_of_brith: data.data_of_brith || doctor.data_of_brith,
-      experience: data.experience || doctor.experience,
-      position: data.position || doctor.position,
-      category: data.category || doctor.category,
-      description: data.description || doctor.description,
-      service: serviceData.name || doctor.service
-    }
+      uz_name: data.uz_name || doctor.uz_name,
+      ru_name: data.ru_name || doctor.ru_name,
+      en_name: data.en_name || doctor.en_name,
 
-    await doctorModel.findByIdAndUpdate(id, updateDoctor)
+      username: data.username,
+
+      uz_experience: data.uz_experience || doctor.uz_experience,
+      ru_experience: data.ru_experience || doctor.ru_experience,
+      en_experience: data.en_experience || doctor.en_experience,
+
+      uz_position: data.uz_position || doctor.uz_position,
+      ru_position: data.ru_position || doctor.ru_position,
+      en_position: data.en_position || doctor.en_position,
+
+      uz_category: data.uz_category || doctor.uz_category,
+      ru_category: data.ru_category || doctor.ru_category,
+      en_category: data.en_category || doctor.en_category,
+
+      uz_description: data.uz_description || doctor.uz_description,
+      ru_description: data.ru_description || doctor.ru_description,
+      en_description: data.en_description || doctor.en_description,
+
+      service: serviceData.uz_name,
+      image: fileUrl, // Yangi rasm URL
+    };
+
+    await doctorModel.findByIdAndUpdate(id, updateDoctor);
 
     return res.status(200).send({
       message: "Shifokor ma'lumotlari muvaffaqiyatli yangilandi!",
-      doctor
-    })
+      doctor: updateDoctor,
+    });
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -229,26 +305,28 @@ exports.updateDoctor = async (req, res) => {
     }
     return res.status(500).send("Serverda xatolik!");
   }
-}
+};
 
 // Doctor parolini yangilash
 exports.updatePassword = async (req, res) => {
   try {
-    const { params: { id } } = req
+    const {
+      params: { id },
+    } = req;
 
     // Checking id to valid.
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).send({
-        error: "ID haqiqiy emas!"
-      })
+        error: "ID haqiqiy emas!",
+      });
     }
 
-    const doctor = await doctorModel.findById(id)
+    const doctor = await doctorModel.findById(id);
 
     if (!doctor) {
       return res.status(404).send({
-        error: "Shifikor topilmadi!"
-      })
+        error: "Shifikor topilmadi!",
+      });
     }
 
     // error bilan ishlash
@@ -260,28 +338,24 @@ exports.updatePassword = async (req, res) => {
     }
     const data = matchedData(req);
 
-    // data bo'sh emasligini tekshirish
-    if (!Object.keys(data)) {
-      return res.status(404).send({
-        error: "Ma'lumotlar topilmadi!"
-      })
-    }
-
     // Parolni hashlash
-    const passwordHash = await bcrypt.hash(data.password, 10)
-    delete data.password
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    delete data.password;
 
     console.log(passwordHash);
 
-
-    const updating = await doctorModel.findByIdAndUpdate(id, {
-      password: passwordHash
-    }, { new: true })
+    const updating = await doctorModel.findByIdAndUpdate(
+      id,
+      {
+        password: passwordHash,
+      },
+      { new: true },
+    );
 
     return res.status(200).send({
       message: "Shifokor paroli yangilandi!",
-      doctor: doctor
-    })
+      doctor: doctor,
+    });
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -291,33 +365,61 @@ exports.updatePassword = async (req, res) => {
     }
     return res.status(500).send("Serverda xatolik!");
   }
-}
+};
 
 // Doctorni o'chirish
 exports.deleteDoctor = async (req, res) => {
   try {
-    const { params: { id } } = req
+    const {
+      params: { id },
+    } = req;
 
     // Checking id to valid.
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).send({
-        error: "ID haqiqiy emas!"
-      })
+        error: "ID haqiqiy emas!",
+      });
     }
 
-    const doctor = await doctorModel.findById(id)
+    const doctor = await doctorModel.findById(id);
 
     if (!doctor) {
       return res.status(404).send({
-        error: "Shifikor topilmadi!"
-      })
+        error: "Shifikor topilmadi!",
+      });
     }
 
-    await doctorModel.findByIdAndDelete(id)
+    const fileUrl = doctor.image
+
+    if (fileUrl) {
+      const filePath = fileUrl.replace(`${supabase.storageUrl}/object/public/Images/`, '');
+
+      // Faylning mavjudligini tekshirish
+      const { data: fileExists, error: checkError } = await supabase
+        .storage
+        .from('Images')
+        .list('', { prefix: filePath });
+
+      if (checkError) {
+        console.error(`Fayl mavjudligini tekshirishda xatolik: ${checkError.message}`);
+      } else if (fileExists && fileExists.length > 0) {
+        // Faylni o‘chirish
+        const { error: deleteError } = await supabase
+          .storage
+          .from('Images')
+          .remove([filePath]);
+
+        if (deleteError) {
+          throw new Error(`Faylni o'chirishda xatolik: ${deleteError.message}`);
+        } 
+      }
+    }
+
+    await doctorModel.findByIdAndDelete(id);
 
     return res.status(200).send({
-      message: "Shifokor muvaffaqiyatli o'chirildi!"
-    })
+      message: "Shifokor muvaffaqiyatli o'chirildi!",
+    });
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -327,22 +429,19 @@ exports.deleteDoctor = async (req, res) => {
     }
     return res.status(500).send("Serverda xatolik!");
   }
-}
+};
 
 // Doctorlarni qidirish
 exports.searchDoctors = async (req, res) => {
   try {
-    const data = await doctorModel.find(
-      {
-        "$or": [
-          { fullName: { $regex: req.params.key } },
-          { position: { $regex: req.params.key } },
-          { service: { $regex: req.params.key } }
-        ]
-      }
-    )
-    return res.send(data)
-
+    const data = await doctorModel.find({
+      $or: [
+        { fullName: { $regex: req.params.key } },
+        { position: { $regex: req.params.key } },
+        { service: { $regex: req.params.key } },
+      ],
+    });
+    return res.send(data);
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -352,4 +451,4 @@ exports.searchDoctors = async (req, res) => {
     }
     return res.status(500).send("Serverda xatolik!");
   }
-}
+};

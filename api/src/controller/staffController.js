@@ -13,17 +13,18 @@ exports.createStaff = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const staff = await staffModel.create({
-            fullName: data.fullName,
-            position: data.position,
-            description: data.description
+            uz_name: data.uz_name,
+            ru_name: data.ru_name,
+            en_name: data.en_name,
+
+            uz_position: data.uz_position,
+            ru_position: data.ru_position,
+            en_position: data.en_position,
+
+            uz_description: data.uz_description,
+            ru_description: data.ru_description,
+            en_description: data.en_description
         })
 
         return res.status(200).send({
@@ -134,17 +135,18 @@ exports.updateStaff = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const updatedStaff = {
-            fullName: data.fullName || staff.fullName,
-            position: data.position || staff.position,
-            description: data.description || staff.description
+            uz_name: data.uz_name || staff.uz_name,
+            ru_name: data.ru_name || staff.ru_name,
+            en_name: data.en_name || staff.en_name,
+
+            uz_position: data.uz_position || staff.uz_position,
+            ru_position: data.ru_position || staff.ru_position,
+            en_position: data.en_position || staff.en_position,
+
+            uz_description: data.uz_description || staff.uz_description,
+            ru_description: data.ru_description || staff.ru_description,
+            en_description: data.en_description || staff.en_description
         }
 
         await staffModel.findByIdAndUpdate(id, updatedStaff)
@@ -156,9 +158,9 @@ exports.updateStaff = async (req, res) => {
     } catch (error) {
         console.log(error);
         if (error.message) {
-          return res.status(400).send({
-            error: error.message,
-          });
+            return res.status(400).send({
+                error: error.message,
+            });
         }
         return res.status(500).send("Serverda xatolik!");
     }
@@ -192,9 +194,9 @@ exports.deleteStaff = async (req, res) => {
     } catch (error) {
         console.log(error);
         if (error.message) {
-          return res.status(400).send({
-            error: error.message,
-          });
+            return res.status(400).send({
+                error: error.message,
+            });
         }
         return res.status(500).send("Serverda xatolik!");
     }
@@ -205,8 +207,8 @@ exports.searchStaff = async (req, res) => {
         const data = await staffModel.find(
             {
                 "$or": [
-                    {fullName: {$regex: req.params.key}},
-                    {position: {$regex: req.params.key}}
+                    { fullName: { $regex: req.params.key } },
+                    { position: { $regex: req.params.key } }
                 ]
             }
         )

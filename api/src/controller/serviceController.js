@@ -13,17 +13,18 @@ exports.createService = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const service = await serviceModel.create({
-            name: data.name,
-            title: data.title,
-            description: data.description
+            uz_name: data.uz_name,
+            ru_name: data.ru_name,
+            en_name: data.en_name,
+
+            uz_title: data.uz_title,
+            ru_title: data.ru_title,
+            en_title: data.en_title,
+
+            uz_description: data.uz_description,
+            ru_description: data.ru_description,
+            en_description: data.en_description
         })
 
         return res.status(200).send({
@@ -134,17 +135,18 @@ exports.updateService = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const updatedService = {
-            name: data.name || service.name,
-            title: data.title || service.title,
-            description: data.description || service.description
+            uz_name: data.uz_name || service.uz_name,
+            ru_name: data.ru_name || service.ru_name,
+            en_name: data.en_name || service.en_name,
+
+            uz_title: data.uz_title || service.uz_title,
+            ru_title: data.ru_title || service.ru_title,
+            en_title: data.en_title || service.en_title,
+
+            uz_description: data.uz_description || service.uz_description,
+            ru_description: data.ru_description || service.ru_description,
+            en_description: data.en_description || service.en_description
         }
 
         await serviceModel.findByIdAndUpdate(id, updatedService)

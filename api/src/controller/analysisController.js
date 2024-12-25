@@ -14,13 +14,6 @@ exports.getAnalysis = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (Object.keys(data).length === 0) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const result = await patientModel.findOne({orderNumber: data.orderNumber})
 
         if (!result) {

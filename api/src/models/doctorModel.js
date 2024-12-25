@@ -1,13 +1,28 @@
 const mongoose = require('mongoose')
 
 const doctorSchema = new mongoose.Schema({
-    fullName: String,
+    uz_name: String,
+    ru_name: String,
+    en_name: String,
+    
     username: String,
     password: String,
-    experience: String,
-    position: String,
-    category: String,
-    description: String,
+    
+    uz_experience: String,
+    ru_experience: String,
+    en_experience: String,
+
+    uz_position: String,
+    ru_position: String,
+    en_position: String,
+
+    uz_category: String,
+    ru_category: String,
+    en_category: String,
+
+    uz_description: String,
+    ru_description: String,
+    en_description: String,
     image: String,
     service: String,
     role: {type: String, default: 'doctor'}
