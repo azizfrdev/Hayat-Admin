@@ -8,6 +8,7 @@ const newsSchema = new mongoose.Schema({
     uz_description: String,
     ru_description: String,
     en_description: String,
+    image: String
 }, {timestamps: true})
 
 exports.newsModel = mongoose.model('News', newsSchema)
