@@ -1,5 +1,13 @@
+require('dotenv').config()
+const { createClient } = require('@supabase/supabase-js')
 const { staffModel } = require('../models/staffModel')
 const { validationResult, matchedData } = require('express-validator')
+
+// Supabase clientni sozlash
+const supabase = createClient(
+    process.env.Supabase_URL,
+    process.env.Supabase_KEY
+)
 
 // Xodim yaratish
 exports.createStaff = async (req, res) => {
@@ -13,6 +21,28 @@ exports.createStaff = async (req, res) => {
         }
         const data = matchedData(req);
 
+        if (!req.file) {
+            return res.status(400).send({
+                error: "Iltimos, rasm faylni yuklng!"
+            })
+        }
+
+        const { buffer, originalname } = req.file;
+        const fileName = `staff/${Date.now()}-${originalname}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from("Images")
+            .upload(fileName, buffer, {
+                cacheControl: "3600",
+                upsert: false,
+                contentType: req.file.mimetype,
+            });
+
+        if (uploadError) {
+            throw new Error(`Fayl yuklanmadi: ${uploadError.message}`);
+        }
+
+        const fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
+
         const staff = await staffModel.create({
             uz_name: data.uz_name,
             ru_name: data.ru_name,
@@ -24,7 +54,8 @@ exports.createStaff = async (req, res) => {
 
             uz_description: data.uz_description,
             ru_description: data.ru_description,
-            en_description: data.en_description
+            en_description: data.en_description,
+            image: fileUrl
         })
 
         return res.status(200).send({
@@ -135,6 +166,57 @@ exports.updateStaff = async (req, res) => {
         }
         const data = matchedData(req);
 
+        let fileUrl = staff.image
+
+        if (req.file) {
+            try {
+                if (fileUrl) {
+                    const filePath = fileUrl.replace(`${supabase.storageUrl}/object/public/Images/`, '');
+
+                    const { data: fileExists, error: checkError } = await supabase.storage
+                        .from('Images')
+                        .list('', { prefix: filePath });
+
+                    if (checkError) {
+                        console.error(`Fayl mavjudligini tekshirishda xatolik: ${checkError.message}`);
+                    } else if (fileExists && fileExists.length > 0) {
+                        // Faylni o‘chirish
+                        const { error: deleteError } = await supabase
+                            .storage
+                            .from('Images')
+                            .remove([filePath]);
+
+                        if (deleteError) {
+                            throw new Error(`Faylni o'chirishda xatolik: ${deleteError.message}`);
+                        }
+                    }
+                }
+
+                const { buffer, originalname } = req.file
+                const fileName = `staff/${Date.now()}-${originalname}`;
+                const { data: uploadData, error: uploadError } = await supabase
+                    .storage
+                    .from('Images')
+                    .upload(fileName, buffer, {
+                        cacheControl: '3600',
+                        upsert: true,
+                        contentType: req.file.mimetype,
+                    });
+
+                if (uploadError) {
+                    throw new Error(`Fayl yuklanmadi: ${uploadError.message}`);
+                }
+                fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
+            } catch (err) {
+                console.error(`Faylni yangilashda xatolik: ${err.message}`);
+                throw new Error("Yangi faylni yuklash yoki eski faylni o‘chirishda muammo!");
+            }
+        } else {
+            return res.status(404).send({
+                error: "File topilmadi!"
+            })
+        }
+
         const updatedStaff = {
             uz_name: data.uz_name || staff.uz_name,
             ru_name: data.ru_name || staff.ru_name,
@@ -146,7 +228,8 @@ exports.updateStaff = async (req, res) => {
 
             uz_description: data.uz_description || staff.uz_description,
             ru_description: data.ru_description || staff.ru_description,
-            en_description: data.en_description || staff.en_description
+            en_description: data.en_description || staff.en_description,
+            image: fileUrl
         }
 
         await staffModel.findByIdAndUpdate(id, updatedStaff)
@@ -184,6 +267,30 @@ exports.deleteStaff = async (req, res) => {
             return res.status(404).send({
                 error: "Xodim topilmadi!"
             })
+        }
+
+        const fileUrl = staff.image
+
+        if (fileUrl) {
+            const filePath = fileUrl.replace(`${supabase.storageUrl}/object/public/Images/`, '');
+
+            const { data: fileExists, error: checkError } = await supabase.storage
+                .from('Images')
+                .list('', { prefix: filePath });
+
+            if (checkError) {
+                console.error(`Fayl mavjudligini tekshirishda xatolik: ${checkError.message}`);
+            } else if (fileExists && fileExists.length > 0) {
+                // Faylni o‘chirish
+                const { error: deleteError } = await supabase
+                    .storage
+                    .from('Images')
+                    .remove([filePath]);
+
+                if (deleteError) {
+                    throw new Error(`Faylni o'chirishda xatolik: ${deleteError.message}`);
+                }
+            }
         }
 
         await staffModel.findByIdAndDelete(id)

@@ -11,7 +11,8 @@ const staffSchema = new mongoose.Schema({
     
     uz_description: String,
     ru_description: String,
-    en_description: String
+    en_description: String,
+    image: String
 }, {timestamps: true})
 
 exports.staffModel = mongoose.model('Staff', staffSchema)
