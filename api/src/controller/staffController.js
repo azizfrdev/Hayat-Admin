@@ -23,7 +23,7 @@ exports.createStaff = async (req, res) => {
 
         if (!req.file) {
             return res.status(400).send({
-                error: "Iltimos, rasm faylni yuklng!"
+                error: "Iltimos, rasm faylni yuklang!"
             })
         }
 

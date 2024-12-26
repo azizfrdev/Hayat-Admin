@@ -9,7 +9,7 @@ router
 .post('/service-create', roleAccessMiddleware('admin'), checkSchema(createServiceSchema), createService)
 .get('/services', roleAccessMiddleware('admin'), getAllServices)
 .get('/service/:id', roleAccessMiddleware('admin'), getOneService)
-.post('/service/:id/update', roleAccessMiddleware('admin'), checkSchema(updateServiceSchema), updateService)
-.post('/service/:id/delete', roleAccessMiddleware('admin'), deleteService)
+.put('/service/:id/update', roleAccessMiddleware('admin'), checkSchema(updateServiceSchema), updateService)
+.delete('/service/:id/delete', roleAccessMiddleware('admin'), deleteService)
 
 module.exports = router
