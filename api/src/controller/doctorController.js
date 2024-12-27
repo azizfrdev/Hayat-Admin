@@ -436,11 +436,17 @@ exports.searchDoctors = async (req, res) => {
   try {
     const data = await doctorModel.find({
       $or: [
-        { fullName: { $regex: req.params.key } },
-        { position: { $regex: req.params.key } },
-        { service: { $regex: req.params.key } },
+        { uz_name: { $regex: req.params.key } },
+        { uz_position: { $regex: req.params.key } },
       ],
     });
+
+    if (data.length == 0) {
+      return res.status(404).send({
+        message: "Shifokor mavjud emas!"
+      })
+    }
+
     return res.send(data);
   } catch (error) {
     console.log(error);

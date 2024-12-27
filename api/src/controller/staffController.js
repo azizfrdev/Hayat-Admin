@@ -314,11 +314,18 @@ exports.searchStaff = async (req, res) => {
         const data = await staffModel.find(
             {
                 "$or": [
-                    { fullName: { $regex: req.params.key } },
-                    { position: { $regex: req.params.key } }
+                    { uz_name: { $regex: req.params.key } },
+                    { uz_position: { $regex: req.params.key } }
                 ]
             }
         )
+
+        if (data.length == 0) {
+            return res.status(404).send({
+                message: "Xodim mavjud emas!"
+            })
+        }
+
         return res.send(data)
 
     } catch (error) {

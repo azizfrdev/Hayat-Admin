@@ -297,3 +297,29 @@ exports.deleteNews = async (req, res) => {
         return res.status(500).send("Serverda xatolik!");
     }
 }
+
+exports.searchNews = async (req, res) => {
+    try {
+        const data = await newsModel.find({
+            $or: [
+                { uz_title: { $regex: req.params.key } }
+            ]
+        })
+
+        if (data.length == 0) {
+            return res.status(404).send({
+                message: 'Yangilik majud emas!'
+            })
+        }
+
+        return res.send(data)
+    } catch (error) {
+        console.log(error);
+    if (error.message) {
+      return res.status(400).send({
+        error: error.message,
+      });
+    }
+    return res.status(500).send("Serverda xatolik!");
+    }
+}
