@@ -63,13 +63,17 @@ exports.createDoctor = async (req, res) => {
 
     const fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
 
+    // Parolni hashlash
+    const passwordHash = await bcrypt.hash(data.password, 10)
+    delete data.password
+
     const doctor = await doctorModel.create({
       uz_name: data.uz_name,
       ru_name: data.ru_name,
       en_name: data.en_name,
 
       username: data.username,
-      password: data.password,
+      password: passwordHash,
 
       uz_experience: data.uz_experience,
       ru_experience: data.ru_experience,
@@ -354,7 +358,7 @@ exports.updatePassword = async (req, res) => {
 
     return res.status(200).send({
       message: "Shifokor paroli yangilandi!",
-      doctor: doctor,
+      doctor: updating,
     });
   } catch (error) {
     console.log(error);
