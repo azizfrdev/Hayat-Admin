@@ -346,8 +346,6 @@ exports.updatePassword = async (req, res) => {
     const passwordHash = await bcrypt.hash(data.password, 10);
     delete data.password;
 
-    console.log(passwordHash);
-
     const updating = await doctorModel.findByIdAndUpdate(
       id,
       {
@@ -448,7 +446,7 @@ exports.searchDoctors = async (req, res) => {
     if (data.length == 0) {
       return res.status(404).send({
         message: "Shifokor mavjud emas!"
-      })
+      })    
     }
 
     return res.send(data);

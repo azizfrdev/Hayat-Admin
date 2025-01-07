@@ -1,9 +1,9 @@
 const { validationResult, matchedData } = require('express-validator');
-const { analysisModel } = require('../models/analysisModel');
 const { sectionModel } = require('../models/sectionModel');
+const { analysisModel } = require('../models/analysisModel')
 
-// Tahlil yaratish
-exports.createAnalysis = async (req, res) => {
+// Bo'lim yaratish
+exports.createSection = async (req, res) => {
     try {
         // error bilan ishlash
         const errors = validationResult(req);
@@ -14,19 +14,21 @@ exports.createAnalysis = async (req, res) => {
         }
         const data = matchedData(req);
 
-        const newAnalysis = await analysisModel.create({
-            section: data.section,
-            name: data.name,
-            price: data.price
-        })
+        const section = await sectionModel.create({
+            uz_name: data.uz_name,
+            ru_name: data.ru_name,
+            en_name: data.en_name,
 
-        await sectionModel.findByIdAndUpdate(data.section, {
-            $push: { analysis: newAnalysis.id }
+            uz_description: data.uz_description,
+            ru_description: data.ru_description,
+            en_description: data.en_description,
+
+            analysis: []
         })
 
         return res.status(201).send({
-            message: "Tahlil muvaffaqiyatli yaratildi!",
-            newAnalysis
+            message: "Bo'lim muvaffaqiyatli yaratildi!",
+            section
         })
 
     } catch (error) {
@@ -40,20 +42,20 @@ exports.createAnalysis = async (req, res) => {
     }
 }
 
-// Tahlillarni ko'rish
-exports.getAnalysis = async (req, res) => {
+// Hamma bo'limlarni ko'rish
+exports.getSection = async (req, res) => {
     try {
-        const analysis = await analysisModel.find()
+        const section = await sectionModel.find().populate("analysis")
 
-        if (!analysis) {
+        if (!section) {
             return res.status(404).send({
-                error: "Tahlillar topilmadi yoki mavjud emas!"
+                error: "Bo'lim topilmadi!"
             })
         }
 
         return res.status(200).send({
-            message: "Tahlillar ro'yhati!",
-            analysis
+            message: "Bo'limlar ro'yhati!",
+            section
         })
     } catch (error) {
         console.log(error);
@@ -66,8 +68,8 @@ exports.getAnalysis = async (req, res) => {
     }
 }
 
-// Bitta tahlilni olish
-exports.getOneAnalysis = async (req, res) => {
+// Bitta bo'limni olish
+exports.getOneSection = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -78,16 +80,16 @@ exports.getOneAnalysis = async (req, res) => {
             });
         }
 
-        const analysis = await analysisModel.findById(id)
+        const section = await sectionModel.findById(id).populate('analysis')
 
-        if (!analysis) {
+        if (!section) {
             return res.status(404).send({
-                error: 'Talil topilmadi!'
+                error: "Bo'lim topilmadi!"
             })
         }
 
         return res.status(200).send({
-            analysis
+            section
         })
     } catch (error) {
         console.log(error);
@@ -100,8 +102,8 @@ exports.getOneAnalysis = async (req, res) => {
     }
 }
 
-// Tahlilni yangilash
-exports.updateAnalysis = async (req, res) => {
+// Bo'limni yangilash
+exports.updateSection = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -112,11 +114,11 @@ exports.updateAnalysis = async (req, res) => {
             });
         }
 
-        const oldAnalysis = await analysisModel.findById(id)
+        const oldSection = await sectionModel.findById(id)
 
-        if (!oldAnalysis) {
+        if (!oldSection) {
             return res.status(404).send({
-                error: "Tahlil topilmadi!"
+                error: "Section topilmadi!"
             })
         }
 
@@ -129,16 +131,21 @@ exports.updateAnalysis = async (req, res) => {
         }
         const data = matchedData(req);
 
-        const analysis = {
-            name: data.name || oldAnalysis.name,
-            price: data.price || oldAnalysis.price
+        const section = {
+            uz_name: data.uz_name || oldSection.uz_name,
+            ru_name: data.ru_name || oldSection.ru_name,
+            en_name: data.en_name || oldSection.en_name,
+
+            uz_description: data.uz_description || oldSection.uz_description,
+            ru_description: data.ru_description || oldSection.ru_description,
+            en_description: data.en_description || oldSection.en_description
         }
 
-        await analysisModel.findByIdAndUpdate(id, analysis)
+        await sectionModel.findByIdAndUpdate(id, section)
 
         return res.status(201).send({
-            message: "Tahli muvaffaqiyatli yangilandi!",
-            analysis
+            message: "Bo'lim muvaffaqiyatli yangilandi!",
+            section
         })
     } catch (error) {
         console.log(error);
@@ -151,8 +158,8 @@ exports.updateAnalysis = async (req, res) => {
     }
 }
 
-// Tahlilni o'chirish
-exports.deleteAnalysis = async (req, res) => {
+// Bo'limni o'chirish
+exports.deleteSection = async (req, res) => {
     try {
         const { params: { id } } = req
 
@@ -163,23 +170,48 @@ exports.deleteAnalysis = async (req, res) => {
             });
         }
 
-        const analysis = await analysisModel.findById(id)
+        const section = await sectionModel.findById(id)
 
-        if (!analysis) {
+        if (!section) {
             return res.status(404).send({
-                error: "Tahlil topilmadi!"
+                error: "Bo'lim topilmadi!"
             })
         }
 
-        await sectionModel.findByIdAndUpdate(analysis.section._id, {
-            $pull: { analysis: analysis.id }
-        })
+        await analysisModel.deleteMany({ section: id })
 
-        await analysisModel.findByIdAndDelete(id)
+        await sectionModel.findByIdAndDelete(id)
 
         return res.status(200).send({
-            message: "Tahlil muvaffaqiyatli o'chirildi!"
+            message: "Bo'lim muvaffaqiyatli o'chirildi!"
         })
+    } catch (error) {
+        console.log(error);
+        if (error.message) {
+            return res.status(400).send({
+                error: error.message,
+            });
+        }
+        return res.status(500).send("Serverda xatolik!");
+    }
+}
+
+// Bo'limni qidirish
+exports.searchSection = async (req, res) => {
+    try {
+        const data = await sectionModel.find({
+            $or: [
+                { uz_name: { $regex: req.params.key } }
+            ]
+        }).populate('analysis')
+
+        if (data.length == 0) {
+            return res.status(404).send({
+                message: "Bo'lim mavjud emas!"
+            })
+        }
+
+        return res.status(200).send(data)
     } catch (error) {
         console.log(error);
         if (error.message) {

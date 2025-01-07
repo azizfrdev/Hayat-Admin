@@ -8,6 +8,7 @@ const serviceRouter = require('./serviceRouter')
 const newsRouter = require('./newsRouter')
 const patientRouter = require('./patientRouter')
 const analysisRouter = require('./analysisRouter')
+const sectionRouter = require('./sectionRouter')
 
 exports.appRouter = (app) => {
     app.use('/api', loginRouter)
@@ -19,6 +20,7 @@ exports.appRouter = (app) => {
     app.use('/api', jwtAccessMiddleware, newsRouter)
     app.use('/api', jwtAccessMiddleware, patientRouter)
     app.use('/api', jwtAccessMiddleware, analysisRouter)
+    app.use('/api', jwtAccessMiddleware, sectionRouter)
     
     app.use((req, res) => {
         return res.status(404).send({
