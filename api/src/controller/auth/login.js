@@ -25,11 +25,9 @@ exports.login = async (req, res) => {
       });
     }
     const data = matchedData(req);
-    console.log(data);
     
     // Admin user
     let user = await adminModel.findOne({ username: data.username }).lean();
-    console.log(user);
     
     if (user) {
       // Parol to'g'riligini tekshirish
@@ -68,7 +66,6 @@ exports.login = async (req, res) => {
       const role = user.role;
       const service = user.service
       const token = generateToken(userId, role, service);
-      console.log(token);
      
       return res.status(200).send({
         message: 'Login muvvaffaqiyatli amalga oshirildi!',

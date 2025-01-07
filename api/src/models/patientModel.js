@@ -1,14 +1,13 @@
 const mongoose = require('mongoose')
 
 const patientSchema = new mongoose.Schema({
-    uz_name: String,
-    ru_name: String,
-    en_name: String,
-    age: Number,
+    name: String,
+    date_of_birth: Number,
+    gender: String,
     email: String,
-    analysis: String,
-    orderNumber: String,
-    analysiscode: String
+    orderNumber: Number,
+    verificationCode: String,
+    analysisResults: [{type: mongoose.Schema.Types.ObjectId, ref: 'AnalysisResult'}]
 })
 
 exports.patientModel = mongoose.model('Patient', patientSchema)
