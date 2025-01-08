@@ -200,10 +200,6 @@ exports.updateNews = async (req, res) => {
                 console.error(`Faylni yangilashda xatolik: ${error.message}`);
                 throw new Error("Yangi faylni yuklash yoki eski faylni o'chirishda muammo!");
             }
-        } else {
-            return res.status(404).send({
-                error: 'File topilmadi!'
-            })
         }
 
         const updatedNews = {
@@ -214,7 +210,7 @@ exports.updateNews = async (req, res) => {
             uz_description: data.uz_description || news.uz_description,
             ru_description: data.ru_description || news.ru_description,
             en_description: data.en_description || news.en_description,
-            image: fileUrl
+            image: fileUrl || news.image
         }
 
         await newsModel.findByIdAndUpdate(id, updatedNews)

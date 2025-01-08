@@ -2,6 +2,7 @@ require('dotenv').config()
 const { createClient } = require('@supabase/supabase-js')
 const { staffModel } = require('../models/staffModel')
 const { validationResult, matchedData } = require('express-validator')
+const bcrypt = require('bcrypt')
 
 // Supabase clientni sozlash
 const supabase = createClient(
@@ -43,10 +44,49 @@ exports.createStaff = async (req, res) => {
 
         const fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
 
+        if(data.password.length < 8) {
+            return res.status(400).send({
+                error: "Parol kamida 8 ta belgidan iborat bo'lishi kerak!"
+            })
+        }
+
+        // Parolni hashlash
+        const passwordHash = await bcrypt.hash(data.password, 10)
+        delete data.password
+
+        if (data.uz_position === "Registrator") {
+            const staff = await staffModel.create({
+                uz_name: data.uz_name,
+                ru_name: data.ru_name,
+                en_name: data.en_name,
+
+                username: data.username,
+                password: passwordHash,
+                role: data.uz_position,
+
+                uz_position: data.uz_position,
+                ru_position: data.ru_position,
+                en_position: data.en_position,
+
+                uz_description: data.uz_description,
+                ru_description: data.ru_description,
+                en_description: data.en_description,
+                image: fileUrl
+            })
+
+            return res.status(200).send({
+                message: "Xodim muvaffaqiyatli yaratildi!",
+                staff
+            })
+        }
+
         const staff = await staffModel.create({
             uz_name: data.uz_name,
             ru_name: data.ru_name,
             en_name: data.en_name,
+
+            username: data.username,
+            password: passwordHash,
 
             uz_position: data.uz_position,
             ru_position: data.ru_position,
@@ -211,16 +251,19 @@ exports.updateStaff = async (req, res) => {
                 console.error(`Faylni yangilashda xatolik: ${err.message}`);
                 throw new Error("Yangi faylni yuklash yoki eski faylni o‘chirishda muammo!");
             }
-        } else {
-            return res.status(404).send({
-                error: "File topilmadi!"
-            })
         }
+
+        // Parolni hashlash
+        const passwordHash = await bcrypt.hash(data.password, 10)
+        delete data.password
 
         const updatedStaff = {
             uz_name: data.uz_name || staff.uz_name,
             ru_name: data.ru_name || staff.ru_name,
             en_name: data.en_name || staff.en_name,
+
+            username: data.username || staff.username,
+            password: passwordHash || staff.password,
 
             uz_position: data.uz_position || staff.uz_position,
             ru_position: data.ru_position || staff.ru_position,
@@ -229,7 +272,7 @@ exports.updateStaff = async (req, res) => {
             uz_description: data.uz_description || staff.uz_description,
             ru_description: data.ru_description || staff.ru_description,
             en_description: data.en_description || staff.en_description,
-            image: fileUrl
+            image: fileUrl || staff.image
         }
 
         await staffModel.findByIdAndUpdate(id, updatedStaff)
