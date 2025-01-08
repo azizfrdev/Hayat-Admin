@@ -9,9 +9,6 @@ exports.createPatient = async (req, res) => {
     try {
         const generateRandomCode = () => Math.floor(100000 + Math.random() * 900000);
 
-        const generateThreeDigitCode = () => Math.floor(100 + Math.random() * 900);
-
-        const ordernumber = generateThreeDigitCode()
         const code = generateRandomCode()
 
         console.log(code);
@@ -37,14 +34,7 @@ exports.createPatient = async (req, res) => {
                 error: errors.array().map((error) => error.msg),
             });
         }
-        const data = matchedData(req);
-
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
+        const data = req.body
 
         const condidat = await patientModel.findOne({ email: data.email })
 
@@ -55,12 +45,13 @@ exports.createPatient = async (req, res) => {
         }
 
         const patient = await patientModel.create({
-            fullName: data.fullName,
-            age: data.age,
+            name: data.name,
+            date_of_birth: data.date_of_birth,
             email: data.email,
+            gender: data.gender,
             analysis: data.analysis,
-            orderNumber: ordernumber,
-            analysiscode: hashedcode
+            orderNumber: data.orderNumber,
+            verificationCode: hashedcode
         })
 
         // HTML email shabloni
@@ -158,7 +149,7 @@ exports.createPatient = async (req, res) => {
 <body>
     <div class="container">
         <h1>Tasdiqlash kodi</h1>
-        <p><strong>Buyurtma raqami:</strong> ${ordernumber}</p>
+        <p><strong>Buyurtma raqami:</strong> ${data.orderNumber}</p>
         <p><strong>Tasdiqlash kodi:</strong> ${code}</p>
     </div>
 </body>
@@ -281,15 +272,10 @@ exports.updatedPateint = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
-            })
-        }
-
         const updatedPateint = {
-            fullName: data.fullName || patient.fullName,
+            uz_name: data.uz_name || patient.uz_name,
+            ru_name: data.ru_name || patient.ru_name,
+            en_name: data.en_name || patient.en_name,
             age: data.age || patient.age,
             email: data.email || patient.email,
             analysis: data.analysis || patient.analysis

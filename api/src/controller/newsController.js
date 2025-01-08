@@ -1,5 +1,13 @@
+require('dotenv').config()
+const { createClient } = require('@supabase/supabase-js')
 const { newsModel } = require("../models/newsModel")
 const { validationResult, matchedData } = require('express-validator')
+
+// Supabase clientni sozlash
+const supabase = createClient(
+    process.env.Supabase_URL,
+    process.env.Supabase_KEY
+)
 
 // Yangilik yaratish
 exports.createNews = async (req, res) => {
@@ -13,16 +21,33 @@ exports.createNews = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
-            return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
+        if (!req.file) {
+            return res.status(400).send({
+                error: "Iltimos, rasm faylni yuklang!"
             })
         }
 
+        const { buffer, originalname } = req.file;
+        const fileName = `news/${Date.now()}-${originalname}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('Images')
+            .upload(fileName, buffer, {
+                cacheControl: "3600",
+                upsert: false,
+                contentType: req.file.mimetype,
+            });
+
+        const fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
+
         const news = await newsModel.create({
-            title: data.title,
-            description: data.description
+            uz_title: data.uz_title,
+            ru_title: data.ru_title,
+            en_title: data.en_title,
+
+            uz_description: data.uz_description,
+            ru_description: data.ru_description,
+            en_description: data.en_description,
+            image: fileUrl
         })
 
         return res.status(200).send({
@@ -132,16 +157,64 @@ exports.updateNews = async (req, res) => {
         }
         const data = matchedData(req);
 
-        // data bo'sh emasligini tekshirish
-        if (!Object.keys(data)) {
+        let fileUrl = news.image
+
+        if (req.file) {
+            try {
+                if (fileUrl) {
+                    const filePath = fileUrl.replace(`${supabase.storageUrl}/object/public/Images/`, '');
+
+                    const { data: fileExists, error: checkError } = await supabase.storage
+                        .from('Images')
+                        .list('', { prefix: filePath });
+
+                    if (checkError) {
+                        console.error(`Fayl mavjudligini tekshirishda xatolik: ${checkError.message}`);
+                    } else if (fileExists && fileExists.length > 0) {
+                        // Faylni o'chirish
+                        const { error: deleteError } = await supabase.storage
+                            .from('Images')
+                            .remove([filePath]);
+
+                        if (deleteError) {
+                            throw new Error(`Faylni o'chirishda xatolik: ${deleteError.message}`);
+                        }
+                    }
+                }
+
+                const { buffer, originalname } = req.file
+                const fileName = `news/${Date.now()}-${originalname}`;
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('Images')
+                    .upload(fileName, buffer, {
+                        cacheControl: '3600',
+                        upsert: true,
+                        contentType: req.file.mimetype
+                    });
+
+                if (uploadError) {
+                    throw new Error(`Fayl yuklanmadi: ${uploadError.message}`)
+                }
+                fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
+            } catch (error) {
+                console.error(`Faylni yangilashda xatolik: ${error.message}`);
+                throw new Error("Yangi faylni yuklash yoki eski faylni o'chirishda muammo!");
+            }
+        } else {
             return res.status(404).send({
-                error: "Ma'lumotlar topilmadi!"
+                error: 'File topilmadi!'
             })
         }
 
         const updatedNews = {
-            title: data.title || news.title,
-            description: data.description || news.description
+            uz_title: data.uz_title || news.uz_title,
+            ru_title: data.ru_title || news.ru_title,
+            en_title: data.en_title || news.en_title,
+
+            uz_description: data.uz_description || news.uz_description,
+            ru_description: data.ru_description || news.ru_description,
+            en_description: data.en_description || news.en_description,
+            image: fileUrl
         }
 
         await newsModel.findByIdAndUpdate(id, updatedNews)
@@ -182,6 +255,32 @@ exports.deleteNews = async (req, res) => {
             })
         }
 
+        console.log(news);
+        
+
+        const fileUrl = news.image
+
+        if (fileUrl) {
+            const filePath = fileUrl.replace(`${supabase.storageUrl}/object/public/Images/`, '');
+
+            const { data: fileExists, error: checkError } = await supabase.storage
+            .from('Images')
+            .list('', { prefix: filePath });
+
+            if (checkError) {
+                console.error(`Fayl mavjudligini tekshirishda xatolik: ${checkError.message}`);
+            } else if (fileExists && fileExists.length > 0) {
+                // Faylni o'chirish
+                const { error: deleteError } = await supabase.storage
+                .from('Images')
+                .remove([filePath]);
+
+                if (deleteError) {
+                    throw new Error(`Faylni o'chirishda xatolik: ${deleteError}`)
+                }
+            }
+        }
+
         await newsModel.findByIdAndDelete(id)
 
         return res.status(200).send({
@@ -196,5 +295,31 @@ exports.deleteNews = async (req, res) => {
             });
         }
         return res.status(500).send("Serverda xatolik!");
+    }
+}
+
+exports.searchNews = async (req, res) => {
+    try {
+        const data = await newsModel.find({
+            $or: [
+                { uz_title: { $regex: req.params.key } }
+            ]
+        })
+
+        if (data.length == 0) {
+            return res.status(404).send({
+                message: 'Yangilik majud emas!'
+            })
+        }
+
+        return res.send(data)
+    } catch (error) {
+        console.log(error);
+    if (error.message) {
+      return res.status(400).send({
+        error: error.message,
+      });
+    }
+    return res.status(500).send("Serverda xatolik!");
     }
 }
