@@ -32,5 +32,13 @@ exports.createAdminSchema = {
         trim: {
             errorMessage: "Parol orasida ochiq joy bo'lishi mumkin emas"
         }
+    },
+    gender: {
+        isString: {
+            errorMessage: "Gender string bo'lishi kerak"
+        },
+        notEmpty: {
+            errorMessage: "Gender talab qilinadi"
+        }
     }
 }
