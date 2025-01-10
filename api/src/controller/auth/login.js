@@ -7,11 +7,10 @@ const { staffModel } = require("../../models/staffModel");
 require("dotenv").config();
 
 // Token generatsiya qilish
-const generateToken = (id, role, service) => {
+const generateToken = (id, role) => {
   const payload = {
     id,
     role,
-    service
   };
   return jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "1d" });
 };

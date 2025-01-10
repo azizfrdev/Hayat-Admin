@@ -2,7 +2,6 @@ require("dotenv").config();
 const { validationResult, matchedData } = require("express-validator");
 const { createClient } = require("@supabase/supabase-js");
 const { doctorModel } = require("../models/doctorModel");
-const { serviceModel } = require("../models/serviceModel");
 const bcrypt = require("bcrypt");
 
 // Supabase clientni sozlash
