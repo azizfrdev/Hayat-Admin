@@ -8,6 +8,7 @@ import {
   useNotify,
   useRedirect,
   useListContext,
+  SelectInput,
 } from "react-admin";
 import dataProvider from "../../providers/dataProvider";
 import AdminsDelete from "../delete/AdminsDelete";
@@ -98,10 +99,10 @@ const AdminCreate = (props) => {
           source="gender"
           label="Gender"
           choices={[
-            { gender: "male", name: "Male" },
-            { gender: "female", name: "Female" },
+            { id: "male", name: "Male" },
+            { id: "female", name: "Female" },
           ]}
-          optionText={(choice) => choice.id}
+          optionText="id"
           validate={[required()]}
         />
       </SimpleForm>

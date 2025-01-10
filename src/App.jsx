@@ -7,6 +7,7 @@ import authProvider from "./providers/authProvider";
 import CustomLogin from "./components/log/CustomLogin";
 import { AdminList } from "./components/pages/AdminsResource";
 import AdminCreate from "./components/pages/AdminsResource";
+import CustomLayout from "./components/buttons/CustomLayout";
 
 export const App = () => {
 
@@ -15,6 +16,7 @@ export const App = () => {
       authProvider={authProvider}
       dataProvider={dataProvider}
       loginPage={CustomLogin} 
+      layout={CustomLayout}
     >
       <Resource name='admins' list={AdminList} create={AdminCreate} options='admins' />
       <Resource
