@@ -1,5 +1,5 @@
 const { jwtAccessMiddleware } = require('../middlewares/jwt-access-middleware')
-const adminRoouter = require('./adminRouter')
+const adminRouter = require('./adminRouter')
 const loginRouter = require('./login.Router')
 const doctorRouter = require('./doctorRouter')
 const staffRouter = require('./staffRouter')
@@ -12,8 +12,10 @@ const analysisResultRouter = require('./analysisResultRouter')
 const resultRouter = require('./resultRouter')
 
 exports.appRouter = (app) => {
+    app.use('/api', resultRouter)
+    
     app.use('/api', loginRouter)
-    app.use('/api', jwtAccessMiddleware, adminRoouter)
+    app.use('/api', jwtAccessMiddleware, adminRouter)
     app.use('/api', jwtAccessMiddleware, doctorRouter)
     app.use('/api', jwtAccessMiddleware, staffRouter)
     app.use('/api', jwtAccessMiddleware, serviceRouter)
@@ -22,9 +24,7 @@ exports.appRouter = (app) => {
     app.use('/api', jwtAccessMiddleware, analysisRouter)
     app.use('/api', jwtAccessMiddleware, sectionRouter)
     app.use('/api', jwtAccessMiddleware, analysisResultRouter)
-    
-    app.use('/api', resultRouter)
-    
+
     app.use((req, res) => {
         return res.status(404).send({
             error: "Page not found"
