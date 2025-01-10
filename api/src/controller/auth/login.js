@@ -7,10 +7,11 @@ const { staffModel } = require("../../models/staffModel");
 require("dotenv").config();
 
 // Token generatsiya qilish
-const generateToken = (id, role) => {
+const generateToken = (id, role, gender) => {
   const payload = {
     id,
     role,
+    gender
   };
   return jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "1d" });
 };
@@ -41,7 +42,8 @@ exports.login = async (req, res) => {
       // Token generatsiya qilish
       const userId = user._id;
       const role = user.role;
-      const token = generateToken(userId, role);
+      const gender = user.gender
+      const token = generateToken(userId, role, gender);
 
       return res.status(200).send({
         message: 'Login muvvaffaqiyatli amalga oshirildi!',
