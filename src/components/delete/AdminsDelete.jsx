@@ -3,7 +3,6 @@ import CustomDeleteButton from '../buttons/CustomDeleteBtn';
 
 const AdminsDelete = ({ data, index }) => {
   const { username, id, name } = data;
-  console.log('Props in AdminsDelete:', { index });
 
   return (
     <div
@@ -36,7 +35,7 @@ const styles = {
     transition: 'background-color 0.3s', 
   },
   tableRowHover: {
-    backgroundColor: '#f0f8ff',
+    backgroundColor: '#d8e8f0',
   },
   tableCell: {
     flex: 1, 

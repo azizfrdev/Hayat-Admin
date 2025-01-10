@@ -14,7 +14,7 @@ import AdminsDelete from "../delete/AdminsDelete";
 
 export const AdminList = (props) => {
   return (
-    <List {...props} >
+    <List {...props}>
       <AdminListContent />
     </List>
   );
@@ -36,7 +36,7 @@ const AdminListContent = () => {
       {/* Table Rows */}
       <div>
         {data?.map((el, idx) => {
-          return <AdminsDelete key={el.id} data={el} index={idx + 1}/>;
+          return <AdminsDelete key={el.id} data={el} index={idx + 1} />;
         })}
       </div>
     </div>
@@ -45,25 +45,25 @@ const AdminListContent = () => {
 
 const styles = {
   tableHeaderRow: {
-    display: 'flex',
-    padding: '12px 20px',
-    borderBottom: '2px solid #1976d2', 
-    backgroundColor: '#f5f5f5', 
-    fontWeight: 'bold',
-    alignItems: 'center',
-    fontSize: '18px',
-    color: '#333',
+    display: "flex",
+    padding: "12px 20px",
+    borderBottom: "2px solid #1976d2",
+    backgroundColor: "#f5f5f5",
+    fontWeight: "bold",
+    alignItems: "center",
+    fontSize: "18px",
+    color: "#333",
   },
   tableCell: {
     flex: 1,
-    padding: '12px',
-    textAlign: 'center',
-    fontSize: '16px',
-    color: '#555', 
+    padding: "12px",
+    textAlign: "center",
+    fontSize: "16px",
+    color: "#555",
   },
   tableCellIndex: {
-    marginLeft: '20px'
-  }
+    marginLeft: "20px",
+  },
 };
 
 const AdminCreate = (props) => {
@@ -92,15 +92,22 @@ const AdminCreate = (props) => {
       <SimpleForm onSubmit={handleSubmit}>
         <TextInput source="name" label="Name" validate={required()} />
         <TextInput source="username" label="Username" validate={required()} />
-        <TextInput
-          source="password"
-          label="Password"
-          type="password"
-          validate={required()}
+        <TextInput source="password" label="Password" type="password" validate={required()}
+        />
+        <SelectInput
+          source="gender"
+          label="Gender"
+          choices={[
+            { gender: "male", name: "Male" },
+            { gender: "female", name: "Female" },
+          ]}
+          optionText={(choice) => choice.id}
+          validate={[required()]}
         />
       </SimpleForm>
     </Create>
   );
 };
+
 
 export default AdminCreate;

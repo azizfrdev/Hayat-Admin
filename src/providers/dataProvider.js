@@ -98,7 +98,7 @@ const dataProvider = {
         return Promise.reject(new Error('Failed to delete admin.'));
       }
     }
-  }
+  },
 };
 
 export default dataProvider;
