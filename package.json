@@ -13,6 +13,7 @@
     "axios": "^1.7.9",
     "i18next": "^24.2.0",
     "i18next-browser-languagedetector": "^8.0.2",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "navigate": "^0.3.6",
     "ra-data-json-server": "^5.3.0",
