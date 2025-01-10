@@ -190,3 +190,34 @@ exports.deleteAnalysis = async (req, res) => {
         return res.status(500).send("Serverda xatolik!");
     }
 }
+
+// Tahlilni qidirish
+exports.searchAnalysis = async (req, res) => {
+    try {
+        // req.params.key ni xavfsiz qilish uchun maxsus belgilarni qochirish
+        const key = req.params.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+        const regex = new RegExp(key, 'i'); // 'i' flag bilan katta-kichik harfga sezgir emas bo'ladi
+
+        const data = await analysisModel.find({
+            $or: [
+                { name: { $regex: regex } }
+            ]
+        });
+
+        if (data.length === 0) {
+            return res.status(404).send({
+                error: "Tahlil topilmadi!"
+            });
+        }
+
+        return res.status(200).send(data);
+    } catch (error) {
+        console.log(error);
+        if (error.message) {
+            return res.status(400).send({
+                error: error.message,
+            });
+        }
+        return res.status(500).send("Serverda xatolik!");
+    }
+};

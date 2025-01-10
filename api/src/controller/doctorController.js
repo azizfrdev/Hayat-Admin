@@ -2,7 +2,6 @@ require("dotenv").config();
 const { validationResult, matchedData } = require("express-validator");
 const { createClient } = require("@supabase/supabase-js");
 const { doctorModel } = require("../models/doctorModel");
-const { serviceModel } = require("../models/serviceModel");
 const bcrypt = require("bcrypt");
 
 // Supabase clientni sozlash
@@ -28,14 +27,6 @@ exports.createDoctor = async (req, res) => {
     if (condidat) {
       return res.status(400).send({
         error: "Bunday foydalanuvchi nomi allaqachon bor!",
-      });
-    }
-
-    const serviceData = await serviceModel.findById(data.service);
-
-    if (!serviceData) {
-      return res.status(404).send({
-        error: "Xizmat topilmadi!",
       });
     }
 
@@ -91,7 +82,6 @@ exports.createDoctor = async (req, res) => {
       ru_description: data.ru_description,
       en_description: data.en_description,
 
-      service: serviceData.uz_name,
       image: fileUrl,
     });
 
@@ -202,15 +192,6 @@ exports.updateDoctor = async (req, res) => {
     }
     const data = matchedData(req);
 
-    const serviceData = await serviceModel.findById(data.service);
-
-
-    if (!serviceData) {
-      return res.status(404).send({
-        error: "Xizmat topilmadi!",
-      });
-    }
-
     let fileUrl = doctor.image; // Mavjud rasmni saqlash    
 
     if (req.file) {
@@ -260,11 +241,11 @@ exports.updateDoctor = async (req, res) => {
         console.error(`Faylni yangilashda xatolik: ${err.message}`);
         throw new Error("Yangi faylni yuklash yoki eski faylni o‘chirishda muammo!");
       }
-    } else {
-      return res.status(404).send({
-        error: "File topilmadi!"
-      })
     }
+
+    // Parolni hashlash
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    delete data.password;
 
     // Doktorni yangilash
     const updateDoctor = {
@@ -272,7 +253,8 @@ exports.updateDoctor = async (req, res) => {
       ru_name: data.ru_name || doctor.ru_name,
       en_name: data.en_name || doctor.en_name,
 
-      username: data.username,
+      username: data.username || doctor.username,
+      password: passwordHash || doctor.password,
 
       uz_experience: data.uz_experience || doctor.uz_experience,
       ru_experience: data.ru_experience || doctor.ru_experience,
@@ -290,8 +272,7 @@ exports.updateDoctor = async (req, res) => {
       ru_description: data.ru_description || doctor.ru_description,
       en_description: data.en_description || doctor.en_description,
 
-      service: serviceData.uz_name,
-      image: fileUrl, // Yangi rasm URL
+      image: fileUrl || doctor.image 
     };
 
     await doctorModel.findByIdAndUpdate(id, updateDoctor);
@@ -299,64 +280,6 @@ exports.updateDoctor = async (req, res) => {
     return res.status(200).send({
       message: "Shifokor ma'lumotlari muvaffaqiyatli yangilandi!",
       doctor: updateDoctor,
-    });
-  } catch (error) {
-    console.log(error);
-    if (error.message) {
-      return res.status(400).send({
-        error: error.message,
-      });
-    }
-    return res.status(500).send("Serverda xatolik!");
-  }
-};
-
-// Doctor parolini yangilash
-exports.updatePassword = async (req, res) => {
-  try {
-    const {
-      params: { id },
-    } = req;
-
-    // Checking id to valid.
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).send({
-        error: "ID haqiqiy emas!",
-      });
-    }
-
-    const doctor = await doctorModel.findById(id);
-
-    if (!doctor) {
-      return res.status(404).send({
-        error: "Shifikor topilmadi!",
-      });
-    }
-
-    // error bilan ishlash
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).send({
-        error: errors.array().map((error) => error.msg),
-      });
-    }
-    const data = matchedData(req);
-
-    // Parolni hashlash
-    const passwordHash = await bcrypt.hash(data.password, 10);
-    delete data.password;
-
-    const updating = await doctorModel.findByIdAndUpdate(
-      id,
-      {
-        password: passwordHash,
-      },
-      { new: true },
-    );
-
-    return res.status(200).send({
-      message: "Shifokor paroli yangilandi!",
-      doctor: updating,
     });
   } catch (error) {
     console.log(error);

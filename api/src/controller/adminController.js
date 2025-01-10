@@ -2,6 +2,7 @@ const { adminModel } = require("../models/adminModel");
 const { validationResult, matchedData } = require('express-validator')
 const bcrypt = require('bcrypt')
 
+// Admin yaratish
 exports.createAdmin = async (req, res) => {
   try {
     // error bilan ishlash
@@ -25,17 +26,33 @@ exports.createAdmin = async (req, res) => {
     const passwordHash = await bcrypt.hash(data.password, 10)
     delete data.password
 
+    if (data.gender === 'male') {
+      const admin = await adminModel.create({
+        name: data.name,
+        username: data.username,
+        password: passwordHash,
+        gender: data.gender,
+        image: 'https://axhokgpxtritakejsqch.supabase.co/storage/v1/object/public/Images/genderImage/male.png'
+      });
 
-    const admin = await adminModel.create({
-      name: data.name,
-      username: data.username,
-      password: passwordHash,
-    });
+      return res.status(200).send({
+        message: "Admin muvaffaqiyatli yaratildi!",
+        admin
+      });
+    } else {
+      const admin = await adminModel.create({
+        name: data.name,
+        username: data.username,
+        password: passwordHash,
+        gender: data.gender,
+        image: 'https://axhokgpxtritakejsqch.supabase.co/storage/v1/object/public/Images/genderImage/female.png'
+      });
+      return res.status(200).send({
+        message: "Admin muvaffaqiyatli yaratildi!",
+        admin
+      });
+    }
 
-    return res.status(200).send({
-      message: "Admin muvaffaqiyatli yaratildi!",
-      admin
-    });
   } catch (error) {
     console.log(error);
     if (error.message) {
@@ -47,6 +64,7 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
+// Hamma adminlarni ko'rish
 exports.getAllAdmin = async (req, res) => {
   try {
     const admins = await adminModel.find();

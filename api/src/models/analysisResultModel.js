@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 
-const analysisResultSchema = new mongoose.Schema({
+const resultSchema = new mongoose.Schema({
     patient: {type: mongoose.Schema.Types.ObjectId, ref: 'Patient'},
+    section: String,
     analysisType: String,
     analysisResult: String,
     diagnosis: String,
-    treatment: String,
+    recommendation: String,
+    doctor: {type: mongoose.Schema.Types.ObjectId, ref: 'Doctor'}
 }, {timestamps: true});
 
-exports.analysisResultModel = mongoose.model('AnalysisResult', analysisResultSchema);
+exports.resultModel = mongoose.model('AnalysisResult', resultSchema);

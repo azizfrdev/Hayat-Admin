@@ -1,31 +1,11 @@
 require('dotenv').config()
 const { validationResult, matchedData } = require('express-validator')
 const { patientModel } = require('../models/patientModel')
-const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
+const { resultModel } = require('../models/analysisResultModel')
 
 // Bemor yaratish
 exports.createPatient = async (req, res) => {
     try {
-        const generateRandomCode = () => Math.floor(100000 + Math.random() * 900000);
-
-        const code = generateRandomCode()
-
-        console.log(code);
-
-        // Transporter sozlash (Gmail uchun)
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.User_Email,
-                pass: process.env.User_Pass
-            },
-        });
-
-
-        const hashedcode = await bcrypt.hash(code.toString(), 10)
 
         // error bilan ishlash
         const errors = validationResult(req);
@@ -36,11 +16,11 @@ exports.createPatient = async (req, res) => {
         }
         const data = req.body
 
-        const condidat = await patientModel.findOne({ email: data.email })
+        const condidat = await patientModel.findOne({ orderNumber: data.orderNumber })
 
         if (condidat) {
             return res.status(400).send({
-                error: "Bunday emailga tegishli bemor allaqachon ro'yhatdan o'tgan!"
+                error: "Bunday tartib raqamli bemor allaqachon ro'yhatdan o'tgan!"
             })
         }
 
@@ -49,126 +29,15 @@ exports.createPatient = async (req, res) => {
             date_of_birth: data.date_of_birth,
             email: data.email,
             gender: data.gender,
-            analysis: data.analysis,
             orderNumber: data.orderNumber,
-            verificationCode: hashedcode
+
+            analysisResults: []
         })
 
-        // HTML email shabloni
-        const mailOptions = {
-            from: '"Hayat Med" <avazbekqalandarov03@gmail.com>',
-            to: 'qalandarovavazbek1@gmail.com',
-            subject: "Tasdiqlash kodi",
-            html: `
-        <html>
-<head>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #6c5ce7, #0984e3);
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-        }
-
-        .container {
-            max-width: 600px;
-            width: 100%;
-            background: #fff;
-            border-radius: 20px;
-            padding: 50px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-
-        .container:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        h1 {
-            font-size: 3em;
-            font-weight: 700;
-            color: #0984e3;
-            margin-bottom: 30px;
-            letter-spacing: 1px;
-        }
-
-        p {
-            font-size: 1.6em; /* Kattalashgan matn */
-            line-height: 1.8;
-            color: #2d3436;
-            margin: 15px 0;
-        }
-
-        p strong {
-            color: #0984e3;
-            font-weight: bold;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 25px; /* Telefon uchun bo‘shliqlarni kichraytirish */
-            }
-
-            h1 {
-                font-size: 2.4em; /* Telefon uchun sarlavhani kichraytirish */
-            }
-
-            p {
-                font-size: 1.4em; /* Telefon uchun matnni kichraytirish */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px; /* Yana kichik telefonlar uchun bo‘shliq */
-            }
-
-            h1 {
-                font-size: 2.2em; /* H1 kichraytirish */
-            }
-
-            p {
-                font-size: 1.3em; /* P matnini yana kichraytirish */
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Tasdiqlash kodi</h1>
-        <p><strong>Buyurtma raqami:</strong> ${data.orderNumber}</p>
-        <p><strong>Tasdiqlash kodi:</strong> ${code}</p>
-    </div>
-</body>
-</html>
-
-    `,
-        };
-
-        // Email yuborish
-        transporter.sendMail (mailOptions, (error, info) => {
-            if (error) {
-                console.log('Xatolik yuz berdi:', error);
-                return res.status(500).json({ message: 'Xatolik yuz berdi!' });
-            }
-            return res.status(200).send({
-                message: "Bemor muvaffaqiyatli yaratildi va emailga yuborldi!",
-                patient
-            })
-        });
+        return res.status(201).send({
+            message: "Bemor muvaffaqiyatli yaratildi!",
+            patient
+        })
 
     } catch (error) {
         console.log(error);
@@ -185,8 +54,8 @@ exports.createPatient = async (req, res) => {
 exports.getAllPatients = async (req, res) => {
     try {
         const patients = await patientModel.find()
-
-        if (!patients) {
+        
+        if (!patients || patients.length == 0) {
             return res.status(404).send({
                 error: "Bemorlar mavjud emas!"
             })
@@ -219,7 +88,13 @@ exports.getOnePatient = async (req, res) => {
             })
         }
 
-        const patient = await patientModel.findById(id)
+        const patient = await patientModel.findById(id).populate({
+            path: 'analysisResults',
+            populate: {
+                path: 'doctor',
+                model: 'Doctor'
+            }
+        })
 
         if (!patient) {
             return res.status(404).send({
@@ -273,12 +148,10 @@ exports.updatedPateint = async (req, res) => {
         const data = matchedData(req);
 
         const updatedPateint = {
-            uz_name: data.uz_name || patient.uz_name,
-            ru_name: data.ru_name || patient.ru_name,
-            en_name: data.en_name || patient.en_name,
-            age: data.age || patient.age,
-            email: data.email || patient.email,
-            analysis: data.analysis || patient.analysis
+            name: data.name || patient.name,
+            date_of_birth: data.date_of_birth || patient.date_of_birth,
+            gender: data.gender || patient.gender,
+            email: data.email || patient.email
         }
 
         await patientModel.findByIdAndUpdate(id, updatedPateint)
@@ -319,6 +192,8 @@ exports.deletePatient = async (req, res) => {
             })
         }
 
+        await resultModel.deleteMany({ patient: id })
+
         await patientModel.findByIdAndDelete(id)
 
         return res.status(200).send({
@@ -336,18 +211,24 @@ exports.deletePatient = async (req, res) => {
     }
 }
 
+// Bemorni qidirish
 exports.searchPatient = async (req, res) => {
     try {
         const data = await patientModel.find(
             {
                 "$or": [
-                    { fullName: { $regex: req.params.key } },
-                    { email: { $regex: req.params.key } }
+                    { orderNumber: { $regex: req.params.key } },
                 ]
             }
         )
 
-        return res.send(data)
+        if (data.length == 0) {
+            return res.status(404).send({
+                error: "Bemor topilmadi!"
+            })
+        }
+
+        return res.status(200).send(data)
 
     } catch (error) {
         console.log(error);
