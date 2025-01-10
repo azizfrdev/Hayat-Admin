@@ -6,5 +6,5 @@ exports.createAnalysisSchema = {
 
 exports.updateAnalysisSchema = {
     name: { isString: { errorMessage: "Tahlil nomi sting bolishi kerak!" } },
-    price: { isInt: { errorMessage: "Narxi raqm bo'lishi kerak!" } }
+    price: { isInt: { errorMessage: "Narxi raqam bo'lishi kerak!" } }
 }

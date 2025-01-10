@@ -9,8 +9,8 @@ router
 .get('/patient-search/:key', roleAccessMiddleware(['doctor', 'Registrator']), searchPatient) 
 .post('/patient-create', roleAccessMiddleware(['doctor', 'Registrator']), checkSchema(createPatientSchema), createPatient)
 .get('/patients', roleAccessMiddleware(['doctor', 'Registrator']),  getAllPatients)
-.get('/patient', roleAccessMiddleware('doctor'), getOnePatient)
-.post('/patient/:id/update', roleAccessMiddleware('doctor'), checkSchema(updatePateintSchema), updatedPateint)
-.post('/patient/:id/delete', roleAccessMiddleware('doctor'), deletePatient)
+.get('/patient/:id', roleAccessMiddleware('doctor'), getOnePatient)
+.put('/patient/:id/update', roleAccessMiddleware('doctor'), checkSchema(updatePateintSchema), updatedPateint)
+.delete('/patient/:id/delete', roleAccessMiddleware('doctor'), deletePatient)
 
 module.exports = router
