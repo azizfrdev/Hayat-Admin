@@ -24,15 +24,14 @@ const authProvider = {
 
     // 📘 **Logout**
     logout: async () => {
-        try {
-            await axios.post("http://localhost:3000/api/logout", null, {
-                withCredentials: true,
-            });
-            return Promise.resolve();
-        } catch (error) {
-            console.error("Logout error:", error);
-            return Promise.reject(new Error("Logout failed"));
-        }
+        const token = localStorage.getItem('authtoken')
+        localStorage.removeItem(token);
+        localStorage.clear()
+    },
+
+    getUserData: () => {
+        const user = JSON.parse(localStorage.getItem('gender')); 
+        return user;
     },
 
     // 📘 **Check Authentication**

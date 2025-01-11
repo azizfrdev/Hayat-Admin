@@ -31,21 +31,23 @@ const dataProvider = {
 
   // Create New Admin
   create: async (data) => {
-    const { name, username, password } = data;
+    const { name, username, password, gender } = data;
   
-    if (!name || !username || !password) {
-      console.error("Required admin data (name, username, password) is missing");
+    if (!name || !username || !password || !gender) {
+      console.error("Required admin data (name, username, password, gender) is missing");
       return Promise.reject(new Error("Required admin data is missing"));
     }
-
+    
     const token = localStorage.getItem("authToken");
     const url1 = `${apiUrl}/admin-create`;
+
   
     try {
       const response = await axios.post(url1, { 
         name, 
         username, 
-        password 
+        password, 
+        gender
       }, { 
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -98,7 +100,7 @@ const dataProvider = {
         return Promise.reject(new Error('Failed to delete admin.'));
       }
     }
-  }
+  },
 };
 
 export default dataProvider;
