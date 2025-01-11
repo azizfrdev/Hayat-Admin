@@ -5,6 +5,7 @@ const adminSchema = new mongoose.Schema({
     username: String,
     password: String,
     gender: String,
+    email: String,
     image: String,
     role: {type: String, default: 'admin'}
 }, {timestamps: true})

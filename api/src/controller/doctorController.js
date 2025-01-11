@@ -30,6 +30,12 @@ exports.createDoctor = async (req, res) => {
       });
     }
 
+    const phoneRegex = /^\+998\d{9}$/;
+
+    if (!phoneRegex.test(data.phoneNumber)) {
+      return res.status(400).send({ message: "Telefon raqam noto'g'ri!" });
+    }
+
     if (!req.file) {
       return res.status(400).send({
         error: "Iltimos, rasm faylni yuklang!",
@@ -82,6 +88,7 @@ exports.createDoctor = async (req, res) => {
       ru_description: data.ru_description,
       en_description: data.en_description,
 
+      phoneNumber: data.phoneNumber,
       image: fileUrl,
     });
 
@@ -192,6 +199,12 @@ exports.updateDoctor = async (req, res) => {
     }
     const data = matchedData(req);
 
+    const phoneRegex = /^\+998\d{9}$/;
+
+    if (!phoneRegex.test(data.phoneNumber)) {
+      return res.status(400).send({ message: "Telefon raqam noto'g'ri!" });
+    }
+
     let fileUrl = doctor.image; // Mavjud rasmni saqlash    
 
     if (req.file) {
@@ -272,6 +285,7 @@ exports.updateDoctor = async (req, res) => {
       ru_description: data.ru_description || doctor.ru_description,
       en_description: data.en_description || doctor.en_description,
 
+      phoneNumber: data.phoneNumber || doctor.phoneNumber,
       image: fileUrl || doctor.image 
     };
 
@@ -291,6 +305,57 @@ exports.updateDoctor = async (req, res) => {
     return res.status(500).send("Serverda xatolik!");
   }
 };
+
+// Parolni yangilash
+exports.updatePassword = async (req, res) => {
+  try {
+    const { params: { id }, } = req;
+
+    // ID ni tekshirish
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).send({
+        error: "ID haqiqiy emas!",
+      });
+    }
+
+    const doctor = await doctorModel.findById(id);
+
+    if (!doctor) {
+      return res.status(404).send({
+        error: "Shifikor topilmadi!",
+      });
+    }
+
+    // error bilan ishlash
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).send({
+        error: errors.array().map((error) => error.msg),
+      });
+    }
+    const data = matchedData(req);
+
+    // Parolni hashlash
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    delete data.password;
+
+    const updatedPassword = {
+      password: passwordHash
+    }
+
+    await doctorModel.findByIdAndUpdate(id, updatedPassword, {new: true})
+
+    return res.status(201).send('Parol muvaffaqiyatli yangilandi!')
+  } catch (error) {
+    console.log(error);
+    if (error.message) {
+      return res.status(400).send({
+        error: error.message,
+      });
+    }
+    return res.status(500).send("Serverda xatolik!");
+  }
+}
 
 // Doctorni o'chirish
 exports.deleteDoctor = async (req, res) => {
