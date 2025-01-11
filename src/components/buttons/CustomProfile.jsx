@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AppBar } from "react-admin";
 import { Avatar, Button } from "@mui/material";
-import jwtDecode from "jwt-decode"; 
+import { jwtDecode } from "jwt-decode";
 import authProvider from "../../providers/authProvider";
 import { Navigate } from "react-router-dom";
 
@@ -50,7 +50,7 @@ const CustomUserMenu = () => {
     return (
         <>
             <Avatar
-                src={profilePicture || "default_image_url_here"} // Fallback image if profilePicture is not set
+                src={profilePicture}
                 alt="Profile"
                 onClick={handleAvatarClick}
             />
