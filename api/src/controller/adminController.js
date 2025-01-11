@@ -1,6 +1,14 @@
 const { adminModel } = require("../models/adminModel");
 const { validationResult, matchedData } = require('express-validator')
 const bcrypt = require('bcrypt')
+require("dotenv").config();
+const { createClient } = require('@supabase/supabase-js')
+
+// Supabase clientni sozlash
+const supabase = createClient(
+  process.env.Supabase_URL,
+  process.env.Supabase_KEY,
+);
 
 // Admin yaratish
 exports.createAdmin = async (req, res) => {
@@ -22,36 +30,55 @@ exports.createAdmin = async (req, res) => {
       })
     }
 
+    if (!req.file) {
+      return res.status(400).send({
+        error: "Iltimos, rasm faylni yuklang!",
+      });
+    }
+
+    // Rasm hajmini tekshirish (maksimal 2 MB)
+    const maxFileSize = 2 * 1024 * 1024; // 2 MB
+    if (req.file.size > maxFileSize) {
+      return res.status(400).send({
+        error: "Rasm hajmi 2 MB dan oshmasligi kerak!",
+      });
+    }
+
+    // Faylni Supabase storagega yuklash
+    const { buffer, originalname } = req.file;
+    const fileName = `admins/${Date.now()}-${originalname}`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("Images") // Bu yerda bucket nomini yozing
+      .upload(fileName, buffer, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: req.file.mimetype,
+      });
+
+    if (uploadError) {
+      throw new Error(`Fayl yuklanmadi: ${uploadError.message}`);
+    }
+
+    const fileUrl = `${supabase.storageUrl}/object/public/Images/${fileName}`;
+
     // Parolni hashlash
     const passwordHash = await bcrypt.hash(data.password, 10)
     delete data.password
 
-    if (data.gender === 'male') {
-      const admin = await adminModel.create({
-        name: data.name,
-        username: data.username,
-        password: passwordHash,
-        gender: data.gender,
-        image: 'https://axhokgpxtritakejsqch.supabase.co/storage/v1/object/public/Images/genderImage/male.png'
-      });
+    const admin = await adminModel.create({
+      name: data.name,
+      username: data.username,
+      password: passwordHash,
+      gender: data.gender,
+      email: data.email,
+      image: fileUrl
+    });
 
-      return res.status(200).send({
-        message: "Admin muvaffaqiyatli yaratildi!",
-        admin
-      });
-    } else {
-      const admin = await adminModel.create({
-        name: data.name,
-        username: data.username,
-        password: passwordHash,
-        gender: data.gender,
-        image: 'https://axhokgpxtritakejsqch.supabase.co/storage/v1/object/public/Images/genderImage/female.png'
-      });
-      return res.status(200).send({
-        message: "Admin muvaffaqiyatli yaratildi!",
-        admin
-      });
-    }
+    return res.status(200).send({
+      message: "Admin muvaffaqiyatli yaratildi!",
+      admin
+    });
 
   } catch (error) {
     console.log(error);
@@ -91,32 +118,57 @@ exports.getAllAdmin = async (req, res) => {
 // Adminni o'chirish
 exports.deleteAdmin = async (req, res) => {
   try {
-    const { id } = req.params;  // Get the ID from the URL params
+    const { id } = req.params;
 
     // Validate the ID format
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).send({
-        error: "Invalid ID format!"  // Improved error message
+        error: "Invalid ID format!"
       });
     }
 
-    const admin = await adminModel.findById(id);  // Find admin by ID
-
+    const admin = await adminModel.findById(id);
     if (!admin) {
       return res.status(404).send({
-        error: "Admin not found!"  // Improved error message
+        error: "Admin not found!"
       });
     }
 
-    await adminModel.findByIdAndDelete(id);  // Delete admin by ID
+    const fileUrl = admin.image
+
+    if (fileUrl) {
+      const filePath = fileUrl.replace(`${supabase.storageUrl}/object/public/Images/`, '');
+
+      // Faylning mavjudligini tekshirish
+      const { data: fileExists, error: checkError } = await supabase
+        .storage
+        .from('Images')
+        .list('', { prefix: filePath });
+
+      if (checkError) {
+        console.error(`Fayl mavjudligini tekshirishda xatolik: ${checkError.message}`);
+      } else if (fileExists && fileExists.length > 0) {
+        // Faylni o‘chirish
+        const { error: deleteError } = await supabase
+          .storage
+          .from('Images')
+          .remove([filePath]);
+
+        if (deleteError) {
+          throw new Error(`Faylni o'chirishda xatolik: ${deleteError.message}`);
+        }
+      }
+    }
+
+    await adminModel.findByIdAndDelete(id);
 
     return res.status(200).send({
-      message: "Admin deleted successfully!"  // Success message
+      message: "Admin deleted successfully!"
     });
   } catch (error) {
     console.error(error);
     return res.status(500).send({
-      error: error.message || "An error occurred while deleting the admin!"  // Handle unexpected errors
+      error: error.message || "An error occurred while deleting the admin!"
     });
   }
 };

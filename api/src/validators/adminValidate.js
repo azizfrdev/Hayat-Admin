@@ -23,7 +23,7 @@ exports.createAdminSchema = {
             errorMessage: "Pareol string bo'lishi kerak"
         },
         isLength: {
-            options: { min: 8},
+            options: { min: 8 },
             errorMessage: "Parol kamida 8 ta belgidan iborat bo'lishi kerak"
         },
         notEmpty: {
@@ -40,5 +40,21 @@ exports.createAdminSchema = {
         notEmpty: {
             errorMessage: "Gender talab qilinadi"
         }
+    },
+
+    email: { isEmail: { errorMessage: "Elektron pochta manzili yaroqsiz!" }, notEmpty: { errorMessage: "Elektron pochta manzili talab qilinadi!" } },
+
+    image: {
+        custom: {
+            options: (value, { req }) => {
+                const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (req.file) {
+                    if (!validMimeTypes.includes(req.file.mimetype)) {
+                        throw new Error('Image must be only JPEG, PNG, GIF, WEBP format!');
+                    }
+                }
+                return true;
+            },
+        },
     }
 }
