@@ -24,6 +24,7 @@ const doctorSchema = new mongoose.Schema({
     ru_description: String,
     en_description: String,
     phoneNumber: String,
+    gender: String,
     image: String,  
     role: {type: String, default: 'doctor'}
 }, {timestamps: true})
