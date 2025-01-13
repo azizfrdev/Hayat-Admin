@@ -74,22 +74,24 @@ exports.downloadResult = async (req, res) => {
         const doc = new PDFDocument();
         const fileName = 'tahlil_natijasi.pdf'
 
-        res.setHeader('Content-Type', 'aplication/pdf');
+        res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename: ${fileName}`)
 
         doc.pipe(res)
 
-        doc.fontSize(18).text('Tahlil Natijasi', { align: "center" })
+        doc.fontSize(20).text('Tahlil Natijasi', { align: "center" })
 
-        doc.fontSize(14).text(`F.I.SH: ${result.name}`, { align: 'left' });
+        doc.fontSize(16).text(`F.I.SH: ${result.name}`, { align: 'left' });
         doc.text(`Tug'ilgan sana: ${result.date_of_birth}`);
         doc.text(`Jinsi: ${result.gender}`);
         doc.moveDown()
 
-        doc.fontSize(16).text('Tahlillar:', { underline: true })
+        doc.fontSize(18).text('Tahlillar:', { underline: true })
+
+        const fontPath = path.join(__dirname, '../public/fonts/Roboto-Italic.ttf');
 
         result.analysisResults.forEach(analysis => {
-            doc.fontSize(14).text(`\nBo'lim: ${analysis.section}`);
+            doc.font(fontPath).fontSize(16).text(`\nBo'lim: ${analysis.section}`);
             doc.text(`Tahlil: ${analysis.analysisType}`);
             doc.text(`Natija: ${analysis.analysisResult}`);
             doc.text(`Tashxis: ${analysis.diagnosis}`);
