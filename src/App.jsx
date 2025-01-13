@@ -1,7 +1,7 @@
 import React from "react";
 import { Admin, Resource,} from "react-admin";
 import dataProvider from "./providers/dataProvider";
-import { PostEdit, PostList, PostCreate } from "./components/pages/posts";
+import {DoctorList} from "./components/pages/doctor";
 import PostIcon from "@mui/icons-material/Book";
 import authProvider from "./providers/authProvider";
 import CustomLogin from "./components/log/CustomLogin";
@@ -21,9 +21,7 @@ export const App = () => {
       <Resource name='admins' list={AdminList} create={AdminCreate} options='admins' />
       <Resource
         name='doctor'
-        list={PostList}
-        edit={PostEdit}
-        create={PostCreate}
+        list={DoctorList}
         icon={PostIcon}
         options='doctor'
       />

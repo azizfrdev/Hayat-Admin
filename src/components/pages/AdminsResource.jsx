@@ -12,6 +12,9 @@ import {
 } from "react-admin";
 import dataProvider from "../../providers/dataProvider";
 import AdminsDelete from "../delete/AdminsDelete";
+import {cardio} from 'ldrs';
+
+cardio.register()
 
 export const AdminList = (props) => {
   return (
