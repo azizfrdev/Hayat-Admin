@@ -4,6 +4,7 @@ const { appRouter } = require('./src/Router/router')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
+const path = require('path')
 
 connectDB()
 const app = express()
@@ -16,6 +17,7 @@ app.use(cors({
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Cookie parserni o'rnatig
 app.use(cookieParser(process.env.COOKIE_PARSER_KEY))
