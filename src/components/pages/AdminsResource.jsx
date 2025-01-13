@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   List,
   Create,
@@ -71,11 +71,13 @@ const styles = {
 };
 
 const AdminCreate = (props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const notify = useNotify();
   const redirect = useRedirect();
 
   const handleSubmit = async (data, event) => {
     event.preventDefault();
+    setIsLoading(true);
     try {
       await dataProvider.create(data);
       notify("Admin created successfully!", { type: "success" });
@@ -93,6 +95,11 @@ const AdminCreate = (props) => {
 
   return (
     <Create {...props}>
+      {isLoading && (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: 'center', zIndex: 1000,  }}>
+          <l-cardio size="50" stroke="4" color="#8b0000"></l-cardio>
+        </div>
+      )}
       <SimpleForm onSubmit={handleSubmit}>
         <TextInput source="name" label="Name" validate={required()} />
         <TextInput source="username" label="Username" validate={required()} />
