@@ -43,18 +43,4 @@ exports.createAdminSchema = {
     },
 
     email: { isEmail: { errorMessage: "Elektron pochta manzili yaroqsiz!" }, notEmpty: { errorMessage: "Elektron pochta manzili talab qilinadi!" } },
-
-    image: {
-        custom: {
-            options: (value, { req }) => {
-                const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                if (req.file) {
-                    if (!validMimeTypes.includes(req.file.mimetype)) {
-                        throw new Error('Image must be only JPEG, PNG, GIF, WEBP format!');
-                    }
-                }
-                return true;
-            },
-        },
-    }
 }
