@@ -48,20 +48,37 @@ const CustomUserMenu = () => {
     }
 
     return (
-        <>
+        <div style={styles.avatarContainer}>
             <Avatar
                 src={profilePicture}
                 alt="Profile"
                 onClick={handleAvatarClick}
             />
             {isLogoutVisible && (
-                <Button onClick={handleLogout}>
+                <Button style={styles.logoutButton} onClick={handleLogout}>
                     Logout
                 </Button>
             )}
-        </>
+        </div>
     );
 };
+
+const styles =  {
+    avatarContainer: {
+        position: 'relative',
+        display: 'inline-block', 
+    },
+    
+    logoutButton: {
+        background: '#fff',
+        position: 'absolute',
+        bottom: '-40px', 
+        left: '30%',
+        transform: 'translateX(-50%)',
+        marginTop: '8px',
+    }
+    
+}
 
 const CustomAppBar = (props) => (
     <AppBar {...props} userMenu={<CustomUserMenu />} />
