@@ -88,6 +88,7 @@ exports.createDoctor = async (req, res) => {
       ru_description: data.ru_description,
       en_description: data.en_description,
 
+      gender: data.gender,
       phoneNumber: data.phoneNumber,
       image: fileUrl,
     });
@@ -256,10 +257,6 @@ exports.updateDoctor = async (req, res) => {
       }
     }
 
-    // Parolni hashlash
-    const passwordHash = await bcrypt.hash(data.password, 10);
-    delete data.password;
-
     // Doktorni yangilash
     const updateDoctor = {
       uz_name: data.uz_name || doctor.uz_name,
@@ -267,7 +264,6 @@ exports.updateDoctor = async (req, res) => {
       en_name: data.en_name || doctor.en_name,
 
       username: data.username || doctor.username,
-      password: passwordHash || doctor.password,
 
       uz_experience: data.uz_experience || doctor.uz_experience,
       ru_experience: data.ru_experience || doctor.ru_experience,
@@ -285,6 +281,7 @@ exports.updateDoctor = async (req, res) => {
       ru_description: data.ru_description || doctor.ru_description,
       en_description: data.en_description || doctor.en_description,
 
+      gender: data.gender || doctor.gender,
       phoneNumber: data.phoneNumber || doctor.phoneNumber,
       image: fileUrl || doctor.image 
     };
