@@ -1,4 +1,3 @@
-const { validationResult, matchedData } = require("express-validator");
 const { patientModel } = require("../models/patientModel");
 
 
