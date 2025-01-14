@@ -79,19 +79,30 @@ exports.downloadResult = async (req, res) => {
 
         doc.pipe(res)
 
-        doc.fontSize(20).text('Tahlil Natijasi', { align: "center" })
+        doc.fillColor("#004080").fontSize(20).text('Tahlil Natijasi', { align: "center" })
 
-        doc.fontSize(16).text(`F.I.SH: ${result.name}`, { align: 'left' });
+        doc.fillColor("#000000").fontSize(16).text(`\nF.I.SH: ${result.name}`, { align: 'left' });
         doc.text(`Tug'ilgan sana: ${result.date_of_birth}`);
         doc.text(`Jinsi: ${result.gender}`);
         doc.moveDown()
 
-        doc.fontSize(18).text('Tahlillar:', { underline: true })
+        doc.fillColor("#004080").fontSize(18).text('Tahlillar:', { align: 'center' })
 
-        const fontPath = path.join(__dirname, '../public/fonts/Roboto-Italic.ttf');
+        const fontPath = path.join(__dirname, '../public/fonts/Roboto-VariableFont_wdth,wght.ttf');
+
+        const pageHeight = 750; // PDF sahifasining bo‘yi (standart uchun)
+        let yPosition = doc.y; // Hozirgi vertikal pozitsiya
 
         result.analysisResults.forEach(analysis => {
-            doc.font(fontPath).fontSize(16).text(`\nBo'lim: ${analysis.section}`);
+            const textHeight = 120; // Har bir tahlil uchun taxminiy balandlik
+
+            // Agar matn sahifaga sig‘masa, yangi sahifa qo‘shish
+            if (yPosition + textHeight > pageHeight) {
+                doc.addPage();
+                yPosition = doc.y; // Yangi sahifa boshlanishi
+            }
+
+            doc.fillColor("#000000").font(fontPath).fontSize(16).text(`\nBo'lim: ${analysis.section}`);
             doc.text(`Tahlil: ${analysis.analysisType}`);
             doc.text(`Natija: ${analysis.analysisResult}`);
             doc.text(`Tashxis: ${analysis.diagnosis}`);
