@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const authProvider = {
-    // 📘 **Login**
     login: async (username, password) => {
         try {
             const response = await axios.post(
@@ -12,8 +11,8 @@ const authProvider = {
                 },
             );
 
-            const token = response.data.token; // Extract token from response
-            localStorage.setItem("authToken", token); // Save token to localStorage
+            const token = response.data.token; 
+            localStorage.setItem("authToken", token);
             console.log("Token saved:", token);
             return Promise.resolve();
         } catch (error) {

@@ -1,8 +1,9 @@
 import React from 'react';
-import CustomDeleteButton from '../buttons/CustomDeleteBtn';
+import CustomDeleteButton from '../CustomDeleteBtn';
+
 
 const AdminsDelete = ({ data, index }) => {
-  const { username, id, name } = data;
+  const { username, id, name, email } = data;
 
   return (
     <div
@@ -13,6 +14,7 @@ const AdminsDelete = ({ data, index }) => {
       <div style={styles.tableCellIndex}>{index})</div>
       <div style={styles.tableCell}>{username}</div>
       <div style={styles.tableCell}>{name}</div>
+      <div style={styles.tableCell}>{email}</div>
       <div style={styles.tableCell}>
         <CustomDeleteButton id={id} />
       </div>
