@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUrl = "http://localhost:3000/api";
+const apiUrl = "https://project-4-c2ho.onrender.com";
 const token = localStorage.getItem("authToken");
 
 const dataProvider = {
