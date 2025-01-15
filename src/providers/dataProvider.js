@@ -4,7 +4,7 @@ const apiUrl = "https://project-4-c2ho.onrender.com";
 const token = localStorage.getItem("authToken");
 
 const dataProvider = {
-  // Get List of Admins
+  // Get List of Admins section
   getList: async (resource, params) => {
     if (resource === 'admins') {
       const url = `${apiUrl}/admins`;
