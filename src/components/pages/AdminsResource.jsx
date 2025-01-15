@@ -11,7 +11,7 @@ import {
   SelectInput,
 } from "react-admin";
 import dataProvider from "../../providers/dataProvider";
-import AdminsDelete from "../delete/AdminsDelete";
+import AdminsDelete from "../buttons/delete/AdminsDelete";
 import {cardio} from 'ldrs';
 
 cardio.register()
@@ -34,6 +34,7 @@ const AdminListContent = () => {
         <div style={styles.tableCellIndex}>#</div>
         <div style={styles.tableCell}>Username</div>
         <div style={styles.tableCell}>Full Name</div>
+        <div style={styles.tableCell}>Email</div>
         <div style={styles.tableCell}>Actions</div>
       </div>
 
@@ -79,7 +80,7 @@ const AdminCreate = (props) => {
     event.preventDefault();
     setIsLoading(true);
     try {
-      await dataProvider.create(data);
+      await dataProvider.create('admins', { data: { ...data } });
       notify("Admin created successfully!", { type: "success" });
       redirect("/admins");
     } catch (error) {
@@ -90,6 +91,8 @@ const AdminCreate = (props) => {
       const errorMessage =
         error.response?.data?.message || "Error creating admin!";
       notify(errorMessage, { type: "error" });
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -103,7 +106,8 @@ const AdminCreate = (props) => {
       <SimpleForm onSubmit={handleSubmit}>
         <TextInput source="name" label="Name" validate={required()} />
         <TextInput source="username" label="Username" validate={required()} />
-        <TextInput source="password" label="Password" type="password" validate={required()}
+        <TextInput source="password" label="Password" type="password" validate={required()} />
+        <TextInput source="email" label="Email" validate={required()}
         />
         <SelectInput
           source="gender"

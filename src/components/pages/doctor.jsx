@@ -1,12 +1,27 @@
-import { List, Datagrid, TextField, ReferenceField, EditButton, Edit, SimpleForm, ReferenceInput, TextInput, Create } from "react-admin";
+import React from 'react';
+import {
+  List,
+  Datagrid,
+  TextField,
+  EditButton,
+  DeleteButton,
+} from 'react-admin';
 
-export const DoctorList = () => (
-    <List>
-        <Datagrid rowClick={false}>
-          <TextField source="id" />
-            <ReferenceField source="userId" reference="users" link="show"/>
-            <TextField source="title" />
-            <EditButton />
-        </Datagrid>
+const DoctorList = (props) => {
+  return (
+    <List {...props}>
+      <Datagrid>
+        <TextField source="en_name" label="Doctor's Name" />
+        
+        <TextField source="en_position" label="Position" />
+        
+        <TextField source="phoneNumber" label="Phone Number" />
+        
+        <EditButton />
+        <DeleteButton />
+      </Datagrid>
     </List>
-);
+  );
+};
+
+export default DoctorList;
