@@ -1,5 +1,5 @@
 import React from 'react';
-import { Create, SimpleForm, TextInput, PasswordInput, FileInput, FileField } from 'react-admin';
+import { Create, SimpleForm, TextInput, PasswordInput, FileInput, FileField, SelectInput } from 'react-admin';
 import { Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNotify, useRedirect } from 'react-admin';  
@@ -13,45 +13,27 @@ const DoctorCreate = () => {
     event.preventDefault();
 
     const formData = new FormData();
+    Object.keys(data).forEach((key) => {
+        formData.append(key, data[key]);
+    });
 
-    formData.append('en_name', data.en_name);
-    formData.append('en_experience', data.en_experience);
-    formData.append('en_position', data.en_position);
-    formData.append('en_category', data.en_category);
-    formData.append('en_description', data.en_description);
-
-    formData.append('uz_name', data.uz_name);
-    formData.append('uz_experience', data.uz_experience);
-    formData.append('uz_position', data.uz_position);
-    formData.append('uz_category', data.uz_category);
-    formData.append('uz_description', data.uz_description);
-
-    formData.append('ru_name', data.ru_name);
-    formData.append('ru_experience', data.ru_experience);
-    formData.append('ru_position', data.ru_position);
-    formData.append('ru_category', data.ru_category);
-    formData.append('ru_description', data.ru_description);
-
-    formData.append('password', data.password);
-    formData.append('phoneNumber', data.phoneNumber);
-    formData.append('username', data.username);
-
-    // Append image if present`
+    // Handle image
     if (data.image && data.image.rawFile) {
-      formData.append('image', data.image.rawFile);
+        formData.set('image', data.image.rawFile);
     }
 
     try {
-      await dataProvider.create('doctors', { data: formData });
+        await dataProvider.create('doctors', { data: formData });
 
-      notify("Doctor created successfully!", { type: "success" });
-      redirect("/doctors");
+        notify("Doctor created successfully!", { type: "success" });
+        redirect("/doctors");
     } catch (error) {
-      console.error("Error during doctor creation:", error);
-      const errorMessage = error.response?.data?.message || "Error creating doctor!";
-      notify(errorMessage, { type: "error" });
+        console.error("Error during doctor creation:", error);
+        const errorMessage = error.response?.data?.message || "Error creating doctor!";
+        notify(errorMessage, { type: "error" });
     }
-  };
+};
+
 
   return (
     <Create>
@@ -104,6 +86,16 @@ const DoctorCreate = () => {
         <PasswordInput source="password" label="Password" fullWidth required />
         <TextInput source="phoneNumber" label="Phone Number" fullWidth required />
         <TextInput source="username" label="Username" fullWidth required />
+        <SelectInput
+          source="gender"
+          label="Gender"
+          choices={[
+            { id: 'male', name: 'Male' },
+            { id: 'female', name: 'Female' },
+          ]}
+          fullWidth
+          required
+        />
 
         {/* Image Upload */}
         <FileInput source="image" label="Upload Image" accept="image/*">
