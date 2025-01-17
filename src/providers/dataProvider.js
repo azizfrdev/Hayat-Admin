@@ -86,30 +86,30 @@ const dataProvider = {
     if (resource === 'doctors') {
       const { data } = params;
 
-      if (!data.en_name || !data.en_position || !data.phoneNumber) {
-        throw new Error("Required doctor data (name, position, phoneNumber) is missing");
+      
+      if (!data.get('en_name') || !data.get('en_position') || !data.get('phoneNumber')) {
+          throw new Error("Required doctor data (name, position, phoneNumber) is missing");
       }
 
       console.log("Sending doctor data to backend:", data);
 
       const response = await fetch(`${apiUrl}/doctor-create`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+          method: 'POST',
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+          body: data, 
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create doctor');
+          throw new Error('Failed to create doctor');
       }
 
       const createdDoctor = await response.json();
       return { data: { ...data, id: createdDoctor.id } };
-    }
+  }
 
-    throw new Error(`Unknown resource: ${resource}`);
+  throw new Error(`Unknown resource: ${resource}`);
   },
 
   // Delete Admin or Doctor
