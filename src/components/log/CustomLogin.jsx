@@ -1,18 +1,26 @@
 import React, { useState } from "react";
 import authProvider from "../../providers/authProvider";
+import { helix } from "ldrs";
+
+helix.register();
 
 const CustomLogin = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true); 
+        setError(""); 
         try {
             await authProvider.login(username, password);
-            window.location.href = "/"; 
+            window.location.href = "/";
         } catch (err) {
             setError("Invalid username or password.");
+        }  finally {
+            setIsLoading(false); 
         }
     };
 
@@ -33,8 +41,15 @@ const CustomLogin = () => {
                 }
                 `}
             </style>
+            {isLoading && (
+                <div style={styles.loaderOverlay}>
+                    <l-helix size="100" speed="2.0" color="#8b0000"></l-helix>
+                </div>
+            )}
             <div style={{ ...styles.card, animation: "boxShadowPulse 2s infinite" }}>
-                <h1 style={styles.heading}>Welcome to <span style={styles.logo}>Hayat-Admin</span></h1>
+                <h1 style={styles.heading}>
+                    Welcome to <span style={styles.logo}>Hayat-Admin</span>
+                </h1>
                 <p style={styles.subtitle}>Please log in to continue</p>
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <input
@@ -51,7 +66,9 @@ const CustomLogin = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         style={styles.input}
                     />
-                    <button type="submit" style={styles.button}>Log In</button>
+                    <button type="submit" style={styles.button}>
+                        Log In
+                    </button>
                 </form>
                 {error && <p style={styles.error}>{error}</p>}
             </div>
@@ -69,7 +86,7 @@ const styles = {
         overflow: "hidden",
     },
     logo: {
-      color: "#bc1111",
+        color: "#bc1111",
     },
     card: {
         width: "400px",
@@ -116,6 +133,18 @@ const styles = {
     error: {
         color: "#dc3545", // Red error message
         marginTop: "10px",
+    },
+    loaderOverlay: {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
     },
 };
 
