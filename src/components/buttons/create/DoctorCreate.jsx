@@ -41,9 +41,7 @@ const DoctorCreate = () => {
       formData.append('image', data.image.rawFile);
     }
 
-    // Assuming you have a function to send this formData to your API
     try {
-      // Replace `dataProvider.create` with your actual API request
       await dataProvider.create('doctors', { data: formData });
 
       notify("Doctor created successfully!", { type: "success" });
