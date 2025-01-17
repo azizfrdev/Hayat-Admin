@@ -13,7 +13,6 @@ const authProvider = {
 
             const token = response.data.token; 
             localStorage.setItem("authToken", token);
-            console.log("Token saved:", token);
             return Promise.resolve();
         } catch (error) {
             console.error("Login error:", error);
@@ -23,9 +22,9 @@ const authProvider = {
 
     // 📘 **Logout**
     logout: async () => {
-        const token = localStorage.getItem('authtoken')
-        localStorage.removeItem(token);
-        localStorage.clear()
+        localStorage.removeItem("authToken");
+        localStorage.clear();
+        return Promise.resolve();
     },
 
     getUserData: () => {
@@ -33,9 +32,20 @@ const authProvider = {
         return user;
     },
 
-    // 📘 **Check Authentication**
-    checkAuth: () => Promise.resolve(),
-    checkError: () => Promise.resolve(),
+    checkAuth: () => {
+        const token = localStorage.getItem("authToken");
+        return token ? Promise.resolve() : Promise.reject(new Error("Not authenticated"));
+    },
+
+    // 📘 **Check Errors**
+    checkError: (error) => {
+        const status = error.status || error.response?.status;
+        if (status === 401 || status === 403) {
+            localStorage.removeItem("authToken");
+            return Promise.reject();
+        }
+        return Promise.resolve();
+    },
 };
 
 export default authProvider;
