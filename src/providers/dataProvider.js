@@ -54,6 +54,35 @@ const dataProvider = {
     }
   },
 
+  getOne: (resource, params) => {
+    const {id} = params;
+
+    if (resource === 'doctors') {
+
+      const url = `${apiUrl}/doctor/${id}`;
+
+      return axios
+        .get(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        })
+        .then((response) => {
+          return {
+            data: { id: response.data.doctor._id, ...response.data.doctor }, 
+          };
+        })
+        .catch((error) => {
+          if (error.response) {
+            throw new Error(`Error fetching doctor: ${error.response.data.message || error.response.statusText}`);
+          } else {
+            throw new Error(`Error fetching doctor: ${error.message}`);
+          }
+        });
+    }
+  },
+
    // Create New Admin
   create: async (resource, params) => {
     if (resource === 'admins') {
@@ -137,7 +166,6 @@ const dataProvider = {
       }
     }
 
-    // Handle deletion for other resources (doctors)
     if (resource === 'doctors' && id) {
       const url = `${apiUrl}/doctor/${id}/delete`;
 
