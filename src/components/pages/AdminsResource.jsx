@@ -38,7 +38,6 @@ const AdminListContent = () => {
         <div style={styles.tableCell}>Actions</div>
       </div>
 
-      {/* Table Rows */}
       <div>
         {data?.map((el, idx) => {
           return <AdminsDelete key={el.id} data={el} index={idx + 1} />;

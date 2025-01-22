@@ -8,8 +8,9 @@ import { AdminList } from "./components/pages/AdminsResource";
 import AdminCreate from "./components/pages/AdminsResource";
 import CustomLayout from "./components/buttons/CustomLayout";
 import DoctorList from "./components/pages/doctor";
-import DoctorShow from "./components/buttons/show/DoctorShow";
+import DoctorShow from "./components/buttons/read/DoctorShow";
 import DoctorCreate from "./components/buttons/create/DoctorCreate";
+import DoctorDelete from "./components/buttons/delete/DoctorDelete";
 
 export const App = () => {
 
@@ -26,6 +27,7 @@ export const App = () => {
         list={DoctorList}
         show={DoctorShow}
         create={DoctorCreate}
+        delete={DoctorDelete}
         icon={PostIcon}
         options='doctors'
       />
