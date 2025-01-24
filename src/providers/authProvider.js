@@ -42,6 +42,7 @@ const authProvider = {
         const status = error.status || error.response?.status;
         if (status === 401 || status === 403) {
             localStorage.removeItem("authToken");
+            window.location.href = "/login";
             return Promise.reject();
         }
         return Promise.resolve();
