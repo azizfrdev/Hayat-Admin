@@ -7,6 +7,12 @@ import {
 } from 'react-admin';
 import CustomDeleteButton from '../buttons/delete/DoctorDelete';
 
+const DoctorFilter = (props) => (
+  <Filter {...props}>
+    <TextInput label="Search by Name" source="q" alwaysOn />
+  </Filter>
+);
+
 const DoctorList = (props) => {
   return (
     <List {...props}>
