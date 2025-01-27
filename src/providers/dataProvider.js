@@ -191,9 +191,36 @@ const dataProvider = {
   // Update Doctor
   update: async (resource, params) => {
     const { id } = params;
-    const { en_name, uz_name, ru_name, en_position, uz_position, ru_position, phoneNumber, en_experience, uz_experience, ru_experience, image } = params.data;
+    const { en_name, 
+            uz_name, 
+            ru_name, 
+            en_position, 
+            uz_position, 
+            ru_position,
+            en_experience, 
+            uz_experience, 
+            ru_experience, 
+            en_description, 
+            uz_description, 
+            ru_description, 
+            en_category,
+            uz_category, 
+            ru_category,
+            phoneNumber, 
+            image, 
+            username, 
+            gender } = params.data;
 
-    if (!en_name || !uz_name || !ru_name || !en_position || !uz_position || !ru_position || !phoneNumber || !en_experience || !uz_experience || !ru_experience) {
+    if (!en_name || 
+        !uz_name || 
+        !ru_name || 
+        !en_position || 
+        !uz_position || 
+        !ru_position || 
+        !phoneNumber || 
+        !en_experience || 
+        !uz_experience || 
+        !ru_experience) {
       console.error("Required doctor data is missing");
       return Promise.reject(new Error("Required doctor data is missing"));
     }
@@ -208,10 +235,18 @@ const dataProvider = {
       formData.append("en_position", en_position);
       formData.append("uz_position", uz_position);
       formData.append("ru_position", ru_position);
-      formData.append("phoneNumber", phoneNumber);
+      formData.append("en_description", en_description);
+      formData.append("uz_description", uz_description);
+      formData.append("ru_description", ru_description);
+      formData.append("en_category", en_category);
+      formData.append("uz_category", uz_category);
+      formData.append("ru_category", ru_category);
       formData.append("en_experience", en_experience);
       formData.append("uz_experience", uz_experience);
       formData.append("ru_experience", ru_experience);
+      formData.append("phoneNumber", phoneNumber);
+      formData.append("username", username);
+      formData.append("gender", gender);
       if (image) formData.append("image", image);
 
       const response = await axios.put(url, formData, {
@@ -222,12 +257,7 @@ const dataProvider = {
       });
 
       if (response.status === 200 || response.status === 201) {
-        const doctorId = response.data.id || response.data._id || response.data.doctor?.id || response.data.doctor?._id;
-        if (doctorId) {
-          return { data: { ...params.data, id: doctorId } };
-        } else {
-          return Promise.reject(new Error("Failed to update doctor: missing ID in response."));
-        }
+        return { data: { ...params.data, id: id } };  
       } else {
         return Promise.reject(new Error("Failed to update doctor: unexpected status."));
       }
