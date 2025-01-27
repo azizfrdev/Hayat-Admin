@@ -11,11 +11,9 @@ import DoctorShow from "./components/buttons/read/DoctorShow";
 import DoctorCreate from "./components/buttons/create/DoctorCreate";
 import DoctorDelete from "./components/buttons/delete/DoctorDelete";
 import DoctorEdit from "./components/buttons/edit/DoctorEdit";
-
 import { themes } from './themes/themes';
-
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import ColorLensIcon from '@mui/icons-material/ColorLens'; // Icon for theme dropdown
+import ColorLensIcon from '@mui/icons-material/ColorLens'; 
 
 export const App = () => {
   const [currentTheme, setCurrentTheme] = useState(themes[0].light); 
@@ -84,6 +82,7 @@ export const App = () => {
       <Admin
         authProvider={authProvider}
         dataProvider={dataProvider}
+        disableTelemetry={true}
         loginPage={CustomLogin}
         layout={CustomLayout}
         theme={currentTheme} 

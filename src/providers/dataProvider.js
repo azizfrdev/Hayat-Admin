@@ -8,14 +8,14 @@ const dataProvider = {
   getList: async (resource, params) => {
     if (resource === 'admins') {
       const url = `${apiUrl}/admins`;
-
+  
       try {
         const response = await axios.get(url, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
-
+  
         const json = response.data;
         if (!json.admins || json.admins.length === 0) {
           return { data: [], total: 0 };
@@ -29,30 +29,48 @@ const dataProvider = {
         return Promise.reject(new Error("Failed to fetch data."));
       }
     }
+  
+    if (resource === 'doctors') {
+      const { filter } = params;
+      const searchKey = filter?.q || ''; 
+      console.log("Filter query:", filter?.q);
 
-    // If the resource is not 'admins', process it using the generic doctor list endpoint
-    const url = `${apiUrl}/doctors`;
+    
+      const url = searchKey
+        ? `${apiUrl}/doctor-search/${searchKey}`
+        : `${apiUrl}/doctors`; 
+    
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+    
+        const json = response.data;
+        console.log("Response data:", json);
 
-    try {
-      const response = await axios.get(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+        if (!json.doctors || !Array.isArray(json.doctors)) {
+          console.error("Expected an array but received:", json.doctors);
+          return { data: [], total: 0 };
+        }
+    
+        return {
+          data: json.doctors.map((doctor) => ({ id: doctor._id, ...doctor })),
+          total: json.doctors.length,
+        };
 
-      const json = response.data;
-      if (!json.doctors || json.doctors.length === 0) {
-        return { data: [], total: 0 };
+
+      } catch (error) {
+        console.error("GetList error:", error);
+        return Promise.reject(new Error("Failed to fetch data."));
       }
-      return {
-        data: json.doctors.map((doctor) => ({ id: doctor._id, ...doctor })),
-        total: json.total || json.doctors.length,
-      };
-    } catch (error) {
-      console.error("GetList error:", error);
-      return Promise.reject(new Error("Failed to fetch data."));
     }
+    
+  
+    return Promise.reject(new Error(`Resource '${resource}' is not supported by this dataProvider`));
   },
+  
 
   getOne: (resource, params) => {
     const {id} = params;
