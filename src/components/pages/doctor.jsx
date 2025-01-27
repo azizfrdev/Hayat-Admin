@@ -4,18 +4,15 @@ import {
   Datagrid,
   TextField,
   EditButton,
+  SearchInput,
 } from 'react-admin';
 import CustomDeleteButton from '../buttons/delete/DoctorDelete';
 
-const DoctorFilter = (props) => (
-  <Filter {...props}>
-    <TextInput label="Search by Name" source="q" alwaysOn />
-  </Filter>
-);
+const DoctorFilters = [<SearchInput source="q" alwaysOn placeholder="Search (Name, Position)" />];
 
 const DoctorList = (props) => {
   return (
-    <List {...props}>
+    <List {...props} filters={DoctorFilters}>
       <Datagrid>
         <TextField source="en_name" label="Doctor's Name" />
         <TextField source="en_position" label="Position" />
