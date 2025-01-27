@@ -11,9 +11,9 @@ import DoctorList from "./components/pages/doctor";
 import DoctorShow from "./components/buttons/read/DoctorShow";
 import DoctorCreate from "./components/buttons/create/DoctorCreate";
 import DoctorDelete from "./components/buttons/delete/DoctorDelete";
+import DoctorEdit from "./components/buttons/edit/DoctorEdit";
 
 export const App = () => {
-
   return (
     <Admin
       authProvider={authProvider}
@@ -28,6 +28,7 @@ export const App = () => {
         show={DoctorShow}
         create={DoctorCreate}
         delete={DoctorDelete}
+        edit={DoctorEdit} 
         icon={PostIcon}
         options='doctors'
       />

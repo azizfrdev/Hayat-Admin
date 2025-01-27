@@ -15,7 +15,7 @@ const DoctorList = (props) => {
         <TextField source="en_position" label="Position" />
         <TextField source="phoneNumber" label="Phone Number" />
         <EditButton />
-        <CustomDeleteButton/>
+        <CustomDeleteButton />
       </Datagrid>
     </List>
   );
