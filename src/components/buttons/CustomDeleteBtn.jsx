@@ -8,7 +8,7 @@ helix.register()
 
 const CustomDeleteButton = ({ id }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Loader state
+  const [isLoading, setIsLoading] = useState(false); 
   const notify = useNotify();
   const refresh = useRefresh();
 
@@ -28,8 +28,8 @@ const CustomDeleteButton = ({ id }) => {
       console.error('Error deleting admin:', error);
       notify('Error deleting admin!', { type: 'error' });
     } finally {
-      setIsLoading(false); // Hide loader after the operation is complete
-      setIsModalOpen(false); // Close the modal after deletion
+      setIsLoading(false);
+      setIsModalOpen(false); 
     }
   };
 

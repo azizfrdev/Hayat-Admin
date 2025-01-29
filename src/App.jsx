@@ -14,6 +14,9 @@ import DoctorEdit from "./components/buttons/edit/DoctorEdit";
 import { themes } from './themes/themes';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import ColorLensIcon from '@mui/icons-material/ColorLens'; 
+import StaffList from "./components/pages/staff";
+import StaffCreate from "./components/buttons/create/StaffCreate";
+import StaffEdit from "./components/buttons/edit/StaffEdit";
 
 export const App = () => {
   const [currentTheme, setCurrentTheme] = useState(themes[0].light); 
@@ -102,6 +105,7 @@ export const App = () => {
           edit={DoctorEdit}
           options="doctors"
         />
+        <Resource name="staff" list={StaffList} create={StaffCreate} edit={StaffEdit} options='staff'/>
       </Admin>
     </div>
   );
